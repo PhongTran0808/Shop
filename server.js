@@ -27,6 +27,14 @@ app.get('/order', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'mobile.html'));
 });
 
+app.get('/kiosk', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'kiosk.html'));
+});
+
+app.get('/kiosk.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'kiosk.html'));
+});
+
 app.get('/portal', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
