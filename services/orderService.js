@@ -34,7 +34,7 @@ async function calculateBackendOrderTotal(items) {
   return total;
 }
 
-async function processKioskOrder({ items, cashInsertedBills, paymentMethod, customerPhone }) {
+async function processKioskOrder({ items, cashInsertedBills, paymentMethod, customerPhone, insertedTotal }) {
   const calculatedTotal = await calculateBackendOrderTotal(items);
   const orderCode = `SBK-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -65,17 +65,20 @@ async function processKioskOrder({ items, cashInsertedBills, paymentMethod, cust
 
   // Default: CASH payment
   let insertedAmount = 0;
-  if (cashInsertedBills) {
+  if (cashInsertedBills && typeof cashInsertedBills === 'object') {
     insertedAmount =
-      (cashInsertedBills['1k'] || 0) * 1000 +
-      (cashInsertedBills['2k'] || 0) * 2000 +
-      (cashInsertedBills['5k'] || 0) * 5000 +
-      (cashInsertedBills['10k'] || 0) * 10000 +
-      (cashInsertedBills['20k'] || 0) * 20000 +
-      (cashInsertedBills['50k'] || 0) * 50000 +
-      (cashInsertedBills['100k'] || 0) * 100000 +
-      (cashInsertedBills['200k'] || 0) * 200000 +
-      (cashInsertedBills['500k'] || 0) * 500000;
+      (Number(cashInsertedBills['1k']) || 0) * 1000 +
+      (Number(cashInsertedBills['2k']) || 0) * 2000 +
+      (Number(cashInsertedBills['5k']) || 0) * 5000 +
+      (Number(cashInsertedBills['10k']) || 0) * 10000 +
+      (Number(cashInsertedBills['20k']) || 0) * 20000 +
+      (Number(cashInsertedBills['50k']) || 0) * 50000 +
+      (Number(cashInsertedBills['100k']) || 0) * 100000 +
+      (Number(cashInsertedBills['200k']) || 0) * 200000 +
+      (Number(cashInsertedBills['500k']) || 0) * 500000;
+  }
+  if (insertedAmount === 0 && Number(insertedTotal) > 0) {
+    insertedAmount = Number(insertedTotal);
   }
 
   if (insertedAmount < calculatedTotal) {

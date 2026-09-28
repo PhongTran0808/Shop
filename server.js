@@ -24,10 +24,18 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
 
+app.get('/order', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'mobile.html'));
+});
+
+app.get('/portal', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
 app.get('/api/qr', (req, res) => {
-  const host = req.get('host') || 'localhost:7001';
+  const host = req.get('host') || 'shop-ten-drab-87.vercel.app';
   const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-  const defaultUrl = `${protocol}://${host}`;
+  const defaultUrl = `${protocol}://${host}/order`;
   const text = req.query.text || defaultUrl;
   try {
     const qrcode = require('qrcode');
@@ -48,9 +56,9 @@ app.get('/api/system/network-info', (req, res) => {
   const baseUrl = host.includes('localhost') ? 'https://shop-ten-drab-87.vercel.app' : `${protocol}://${host}`;
   res.json({
     lanIp,
-    localUrl: 'https://shop-ten-drab-87.vercel.app/',
-    lanUrl: 'https://shop-ten-drab-87.vercel.app/',
-    mobileUrl: 'https://shop-ten-drab-87.vercel.app/'
+    localUrl: `${baseUrl}/portal`,
+    lanUrl: `${baseUrl}/portal`,
+    mobileUrl: `${baseUrl}/order`
   });
 });
 

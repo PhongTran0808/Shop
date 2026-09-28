@@ -448,6 +448,7 @@ async function submitCashOrder() {
   const payload = {
     items: cart,
     cashInsertedBills: insertedBills,
+    insertedTotal: calculateInsertedTotal(),
     paymentMethod: 'CASH'
   };
 
@@ -570,6 +571,24 @@ function showReceiptModal(data) {
 
     const payMethodText = data.paymentMethod === 'VIETQR' ? 'Chuyển khoản VietQR' : 'Tiền mặt Kiosk';
     const totalAmount = data.calculatedTotal || (data.order ? data.order.total_amount : 0);
+    const insertedAmount = Number(data.insertedAmount) || totalAmount;
+    const changeAmount = Number(data.changeAmount) || 0;
+
+    let cashBreakdownHtml = '';
+    if (data.paymentMethod === 'CASH') {
+      cashBreakdownHtml = `
+        <div class="border-t border-dashed border-gray-300 pt-2.5 mt-2.5 space-y-1.5 text-xs sm:text-sm">
+          <div class="flex justify-between items-center text-gray-700">
+            <span class="font-bold">Tiền khách nạp vào:</span>
+            <span class="font-extrabold text-gray-900">${insertedAmount.toLocaleString('vi-VN')} VNĐ</span>
+          </div>
+          <div class="flex justify-between items-center ${changeAmount > 0 ? 'text-amber-800' : 'text-gray-500'}">
+            <span class="font-bold">Tiền thối lại cho khách:</span>
+            <span class="font-black ${changeAmount > 0 ? 'text-amber-700 text-base sm:text-lg' : 'text-gray-600'}">${changeAmount.toLocaleString('vi-VN')} VNĐ</span>
+          </div>
+        </div>
+      `;
+    }
 
     document.getElementById('receipt-details').innerHTML = `
       <div class="mb-2.5 font-extrabold text-sbk-green text-xs uppercase tracking-wider flex items-center gap-1.5">
@@ -578,48 +597,49 @@ function showReceiptModal(data) {
       </div>
       <div class="space-y-1.5 text-xs sm:text-sm font-medium text-gray-800">${itemsSummary}</div>
       <div class="border-t border-gray-200 pt-3 mt-3 font-black text-base sm:text-lg flex justify-between items-center">
-        <span>TỔNG TIỀN:</span>
+        <span>TỔNG TIỀN ĐƠN:</span>
         <span class="text-sbk-green">${totalAmount.toLocaleString('vi-VN')} VNĐ</span>
       </div>
+      ${cashBreakdownHtml}
     `;
 
     // Handle cash change dispenser UI box & visual animation
     const changeBox = document.getElementById('receipt-change-box');
     const hardwareChangeDisplay = document.getElementById('cash-change-display');
 
-    if (data.changeAmount > 0) {
+    if (changeAmount > 0) {
       if (changeBox) {
-        changeBox.classList.remove('hidden');
         changeBox.style.display = 'block';
       }
       const changeTotalEl = document.getElementById('receipt-change-total');
       if (changeTotalEl) {
-        changeTotalEl.textContent = `Thối lại: ${data.changeAmount.toLocaleString('vi-VN')} VNĐ`;
+        changeTotalEl.textContent = `${changeAmount.toLocaleString('vi-VN')} VNĐ`;
       }
 
       const bills = data.changeBills || {};
-      const billsFormatted = Object.keys(bills)
-        .filter((k) => bills[k] > 0)
-        .map((k) => `
-          <div class="bg-yellow-100/90 border border-yellow-300/80 px-3 py-1.5 rounded-xl font-bold text-yellow-950 flex items-center justify-between text-xs sm:text-sm shadow-2xs">
-            <span>• Tờ ${k}:</span>
-            <span class="bg-amber-600 text-white px-2 py-0.5 rounded-md text-xs font-black">${bills[k]} tờ</span>
-          </div>
-        `)
-        .join('');
+      const activeKeys = Object.keys(bills).filter((k) => bills[k] > 0);
+      const billsFormatted = activeKeys.length > 0
+        ? activeKeys
+            .map((k) => `
+              <div class="bg-yellow-100/95 border border-yellow-300 px-3 py-2 rounded-xl font-bold text-yellow-950 flex items-center justify-between text-xs sm:text-sm shadow-xs">
+                <span>• Mệnh giá ${k}:</span>
+                <span class="bg-amber-600 text-white px-2.5 py-0.5 rounded-md text-xs font-black shadow-xs">${bills[k]} tờ</span>
+              </div>
+            `)
+            .join('')
+        : `<div class="col-span-2 text-xs text-amber-900 italic font-semibold">Đã xuất ${changeAmount.toLocaleString('vi-VN')} VNĐ tại khay tiền</div>`;
 
       const billsEl = document.getElementById('receipt-change-bills');
       if (billsEl) {
-        billsEl.innerHTML = billsFormatted || '<span>Nhả tiền mặt lẻ tại khay</span>';
+        billsEl.innerHTML = billsFormatted;
       }
       if (hardwareChangeDisplay) {
-        hardwareChangeDisplay.textContent = `${data.changeAmount.toLocaleString('vi-VN')} VNĐ`;
+        hardwareChangeDisplay.textContent = `${changeAmount.toLocaleString('vi-VN')} VNĐ`;
       }
 
-      animateCashDispense(data.changeBills, data.changeAmount);
+      animateCashDispense(data.changeBills, changeAmount);
     } else {
       if (changeBox) {
-        changeBox.classList.add('hidden');
         changeBox.style.display = 'none';
       }
       if (hardwareChangeDisplay) {
@@ -627,7 +647,6 @@ function showReceiptModal(data) {
       }
       const slot = document.getElementById('visual-dispenser-slot');
       if (slot) {
-        slot.classList.add('hidden');
         slot.style.display = 'none';
       }
     }

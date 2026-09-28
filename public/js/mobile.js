@@ -317,6 +317,12 @@ function setupEventListeners() {
 
   document.getElementById('submit-mobile-cash-btn').addEventListener('click', submitMobileCashOrder);
 
+  // Copy order link button
+  const copyBtn = document.getElementById('copy-order-link-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', copyOrderLink);
+  }
+
   document.getElementById('finish-mobile-receipt-btn').addEventListener('click', () => {
     const modal = document.getElementById('mobile-receipt-modal');
     modal.classList.add('hidden');
@@ -324,6 +330,45 @@ function setupEventListeners() {
     mobileCart = [];
     updateMobileCartBar();
   });
+}
+
+function copyOrderLink() {
+  const orderUrl = `${window.location.origin}/order`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(orderUrl)
+      .then(showCopyToast)
+      .catch(() => fallbackCopy(orderUrl));
+  } else {
+    fallbackCopy(orderUrl);
+  }
+}
+
+function showCopyToast() {
+  const toast = document.getElementById('toast-notify');
+  if (!toast) return;
+  toast.classList.remove('opacity-0', 'pointer-events-none');
+  toast.classList.add('opacity-100');
+  setTimeout(() => {
+    toast.classList.remove('opacity-100');
+    toast.classList.add('opacity-0', 'pointer-events-none');
+  }, 2500);
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showCopyToast();
+  } catch (e) {
+    alert(`Link đặt món: ${text}`);
+  }
+  document.body.removeChild(ta);
 }
 
 function updateMobileCartBar() {
@@ -512,6 +557,7 @@ async function submitMobileCashOrder() {
   const payload = {
     items: mobileCart,
     cashInsertedBills: insertedBills,
+    insertedTotal,
     paymentMethod: 'CASH'
   };
 
@@ -566,15 +612,68 @@ function showMobileReceipt(data) {
 
     const payMethodText = data.paymentMethod === 'VIETQR' ? 'Chuyển khoản VietQR' : 'Tiền mặt Kiosk';
     const totalAmount = data.calculatedTotal || (data.order ? data.order.total_amount : 0);
+    const insertedAmount = Number(data.insertedAmount) || totalAmount;
+    const changeAmount = Number(data.changeAmount) || 0;
+
+    let cashBreakdownHtml = '';
+    if (data.paymentMethod === 'CASH') {
+      cashBreakdownHtml = `
+        <div class="border-t border-dashed border-gray-300 pt-1.5 mt-1.5 space-y-1 text-xs">
+          <div class="flex justify-between items-center text-gray-700">
+            <span>Tiền khách đã nạp:</span>
+            <span class="font-bold text-gray-900">${insertedAmount.toLocaleString('vi-VN')} VNĐ</span>
+          </div>
+          <div class="flex justify-between items-center ${changeAmount > 0 ? 'text-amber-800' : 'text-gray-500'}">
+            <span class="font-bold">Tiền thối lại cho khách:</span>
+            <span class="font-black ${changeAmount > 0 ? 'text-amber-700 text-sm' : 'text-gray-600'}">${changeAmount.toLocaleString('vi-VN')} VNĐ</span>
+          </div>
+        </div>
+      `;
+    }
 
     document.getElementById('mreceipt-details').innerHTML = `
       <div class="mb-1 font-bold text-sbk-green">PHƯƠNG THỨC: ${payMethodText}</div>
-      ${itemsSummary}
+      <div class="space-y-1">${itemsSummary}</div>
       <div class="border-t border-gray-200 pt-1.5 mt-1.5 font-bold flex justify-between">
         <span>TỔNG TIỀN:</span>
         <span class="text-sbk-green">${totalAmount.toLocaleString('vi-VN')} VNĐ</span>
       </div>
+      ${cashBreakdownHtml}
     `;
+
+    // Handle Mobile Cash Change Box
+    const changeBox = document.getElementById('mreceipt-change-box');
+    if (changeAmount > 0) {
+      if (changeBox) {
+        changeBox.style.display = 'block';
+      }
+      const changeTotalEl = document.getElementById('mreceipt-change-total');
+      if (changeTotalEl) {
+        changeTotalEl.textContent = `${changeAmount.toLocaleString('vi-VN')} VNĐ`;
+      }
+
+      const bills = data.changeBills || {};
+      const activeKeys = Object.keys(bills).filter((k) => bills[k] > 0);
+      const billsFormatted = activeKeys.length > 0
+        ? activeKeys
+            .map((k) => `
+              <div class="bg-yellow-100/90 border border-yellow-300 px-2 py-1 rounded-lg font-bold text-yellow-950 flex items-center justify-between text-xs">
+                <span>• Tờ ${k}:</span>
+                <span class="bg-amber-600 text-white px-1.5 py-0.5 rounded text-[11px] font-black">${bills[k]} tờ</span>
+              </div>
+            `)
+            .join('')
+        : `<div class="col-span-2 text-xs text-amber-900 italic">Đã xuất ${changeAmount.toLocaleString('vi-VN')} VNĐ tại khay tiền</div>`;
+
+      const billsEl = document.getElementById('mreceipt-change-bills');
+      if (billsEl) {
+        billsEl.innerHTML = billsFormatted;
+      }
+    } else {
+      if (changeBox) {
+        changeBox.style.display = 'none';
+      }
+    }
 
     document.getElementById('mreceipt-status-text').textContent = 'Đang chờ Barista tiếp nhận...';
     document.getElementById('mreceipt-status-text').className = 'font-bold text-sbk-green text-xs mt-0.5';

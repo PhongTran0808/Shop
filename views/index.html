@@ -9,64 +9,101 @@
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
   <script src="/js/qrcode.min.js"></script>
 </head>
-<body class="bg-[#f8fafc] text-sbk-dark font-sans min-h-screen flex flex-col items-center justify-center p-6 select-none">
+<body class="bg-[#f8fafc] text-sbk-dark font-sans min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 select-none relative">
 
-  <div class="max-w-6xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-sbk-green/30 my-auto">
+  <!-- Toast Notification -->
+  <div id="portal-toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-emerald-900 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-full shadow-2xl transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2 border border-emerald-400">
+    <span>✓</span> <span>Đã sao chép link đặt món cho khách!</span>
+  </div>
+
+  <div class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-sbk-green/30 my-auto">
     
     <!-- Portal Header Banner -->
-    <div class="bg-sbk-green text-white p-6 text-center">
-      <div class="inline-flex items-center justify-center px-4 py-1.5 bg-white text-sbk-green rounded-full text-xs font-black tracking-widest shadow mb-3">STARBUCKS STORE CONTROL</div>
-      <h1 class="text-2xl font-bold tracking-wide uppercase">STARBUCKS® SMART KIOSK SYSTEM</h1>
-      <p class="text-sbk-cream text-sm mt-1">Hệ Thống Bán Hàng Bán Tự Động: Nạp Tiền Mặt, Thối Tiền Lẻ & VietQR Local</p>
+    <div class="bg-sbk-green text-white p-6 sm:p-8 text-center">
+      <div class="inline-flex items-center justify-center px-4 py-1.5 bg-white text-sbk-green rounded-full text-xs font-black tracking-widest shadow mb-3">STARBUCKS STORE PORTAL</div>
+      <h1 class="text-2xl sm:text-3xl font-black tracking-wide uppercase">STARBUCKS® SMART KIOSK & ORDER SYSTEM</h1>
+      <p class="text-sbk-cream text-xs sm:text-sm mt-1.5 font-medium">Hệ Thống Phân Chia 2 Dạng: Trang Khách Đặt Món (Order-Only) & Quản Trị Toàn Bộ Hệ Thống</p>
     </div>
 
-    <!-- LAN Access Details & Clean Centered QR Section -->
-    <div class="p-8 flex flex-col items-center justify-center text-center border-b border-gray-100 bg-emerald-50/40">
-      <span class="px-3.5 py-1 bg-sbk-green text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-xs mb-3">KẾT NỐI MẠNG LAN / WI-FI KHÔNG DÂY</span>
-      <h2 class="text-xl font-bold text-sbk-dark uppercase">QUÉT MÃ QR ĐỂ MỞ WEB APP TRÊN ĐIỆN THOẠI</h2>
-      <p class="text-xs text-gray-500 max-w-md mt-1 mb-6 leading-relaxed">
-        Sử dụng Camera điện thoại hoặc ứng dụng Zalo / Ngân hàng để quét mã QR bên dưới để mở giao diện đặt món dành riêng cho điện thoại.
+    <!-- MODE 1 / DẠNG 1: DÀNH CHO KHÁCH HÀNG (QUÉT QR HOẶC COPY LINK ĐẶT MÓN) -->
+    <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center border-b border-gray-200 bg-emerald-50/50">
+      <div class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-800 text-white rounded-full text-xs font-black uppercase tracking-wider shadow-sm mb-3">
+        <span>📱 DẠNG 1: DÀNH CHO KHÁCH HÀNG — CHỈ VÀO TRANG ORDER</span>
+      </div>
+      <h2 class="text-lg sm:text-2xl font-black text-sbk-dark uppercase">QUÉT MÃ QR HOẶC COPY LINK ĐẶT MÓN CHO KHÁCH</h2>
+      <p class="text-xs sm:text-sm text-gray-600 max-w-xl mt-1.5 mb-5 leading-relaxed">
+        Khách hàng quét mã QR hoặc mở link được chia sẻ sẽ <b>vào thẳng giao diện Đặt Món</b>, không cần chọn vai trò (role) và không thể truy cập Barista hay Admin.
       </p>
 
-      <div class="p-6 bg-white rounded-2xl shadow-md border-2 border-sbk-green/30 flex flex-col items-center gap-3">
-        <canvas id="qr-canvas" class="rounded-lg border border-gray-200"></canvas>
-        <span id="qr-url-badge" class="px-3 py-1 bg-gray-100 text-sbk-green font-mono font-bold text-xs rounded-full border border-gray-200">
-          Đang nạp IP LAN Server...
-        </span>
+      <div class="p-5 sm:p-6 bg-white rounded-3xl shadow-lg border-2 border-sbk-green/30 flex flex-col items-center gap-3.5 max-w-sm w-full">
+        <canvas id="qr-canvas" class="rounded-xl border border-gray-200 shadow-xs"></canvas>
+        
+        <div class="flex items-center gap-1.5 text-xs text-gray-500 font-semibold">
+          <span>🔗 Link đặt món:</span>
+          <span id="qr-url-badge" class="px-2.5 py-1 bg-gray-100 text-sbk-green font-mono font-bold text-xs rounded-lg border border-gray-200 break-all">
+            https://shop-ten-drab-87.vercel.app/order
+          </span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2 w-full pt-1">
+          <button id="copy-portal-order-link-btn" class="flex-1 py-3 px-4 bg-sbk-green hover:bg-[#004225] active:scale-95 text-white font-bold text-xs uppercase rounded-xl transition shadow flex items-center justify-center gap-1.5 cursor-pointer">
+            <span>📋</span> <span>Sao chép link</span>
+          </button>
+          
+          <a href="/order" target="_blank" class="py-3 px-4 bg-emerald-100 hover:bg-emerald-200 text-emerald-950 font-bold text-xs uppercase rounded-xl transition flex items-center justify-center gap-1 shadow-xs">
+            <span>👉 Mở /order</span>
+          </a>
+        </div>
       </div>
     </div>
 
-    <!-- 4 System Roles Selection Grid -->
-    <div class="p-8 bg-gray-50 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-      
-      <a href="/kiosk.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
-        <span class="px-2.5 py-0.5 bg-sbk-green text-white text-[10px] font-bold rounded-full uppercase mb-2.5">ROLE 1: KHÁCH HÀNG</span>
-        <span class="font-bold text-sbk-green text-sm group-hover:text-[#004225] transition">Màn Hình Kiosk 24"</span>
-        <span class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Giao diện Kiosk 24" màn hình rộng, tự chọn món & nạp tiền thối lẻ tại chỗ.</span>
-      </a>
+    <!-- MODE 2 / DẠNG 2: DÀNH CHO NHÂN VIÊN & QUẢN TRỊ (TRUY CẬP TOÀN BỘ HỆ THỐNG) -->
+    <div class="p-6 sm:p-8 bg-gray-50">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-gray-200 mb-5">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sbk-dark text-white rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1">
+            <span>🔑 DẠNG 2: DÀNH CHO NHÂN VIÊN & QUẢN TRỊ</span>
+          </span>
+          <h3 class="text-base sm:text-lg font-black text-sbk-dark uppercase">TRUY CẬP TOÀN BỘ CÁC VAI TRÒ HỆ THỐNG (FULL ACCESS)</h3>
+        </div>
+        <p class="text-xs text-gray-500 font-medium">Chọn một vai trò bên dưới để bắt đầu làm việc:</p>
+      </div>
 
-      <a href="/mobile.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-sbk-green border-dashed transition hover:bg-emerald-50/50 group">
-        <span class="px-2.5 py-0.5 bg-emerald-700 text-white text-[10px] font-bold rounded-full uppercase mb-2.5">ROLE 2: MOBILE APP</span>
-        <span class="font-bold text-emerald-800 text-sm group-hover:text-sbk-green transition">Giao Diện Điện Thoại</span>
-        <span class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">UI được thiết kế tối ưu 100% cho màn hình Smartphone (iOS / Android).</span>
-      </a>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Role 1: Kiosk -->
+        <a href="/kiosk.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
+          <span class="px-2.5 py-0.5 bg-sbk-green text-white text-[10px] font-bold rounded-full uppercase mb-2">ROLE 1: MÀN HÌNH KIOSK</span>
+          <span class="font-black text-sbk-green text-sm group-hover:text-[#004225] transition">Kiosk Cảm Ứng 24"</span>
+          <span class="text-xs text-gray-500 mt-1 leading-relaxed">Màn hình đặt tại quầy cho khách tự bấm món, nạp tiền mặt và máy thối tiền lẻ.</span>
+        </a>
 
-      <a href="/barista.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
-        <span class="px-2.5 py-0.5 bg-sbk-gold text-sbk-dark text-[10px] font-bold rounded-full uppercase mb-2.5">ROLE 3: PHA CHẾ</span>
-        <span class="font-bold text-sbk-dark text-sm group-hover:text-sbk-green transition">Barista Display (KDS)</span>
-        <span class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Màn hình Barista nhận đơn real-time kèm âm thanh báo pha chế.</span>
-      </a>
+        <!-- Role 2: Barista Display -->
+        <a href="/barista.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
+          <span class="px-2.5 py-0.5 bg-sbk-gold text-sbk-dark text-[10px] font-bold rounded-full uppercase mb-2">ROLE 2: PHA CHẾ BARISTA</span>
+          <span class="font-black text-sbk-dark text-sm group-hover:text-sbk-green transition">Barista Display (KDS)</span>
+          <span class="text-xs text-gray-500 mt-1 leading-relaxed">Màn hình nhận đơn real-time, chuông báo âm thanh và nút bấm hoàn tất món.</span>
+        </a>
 
-      <a href="/admin.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
-        <span class="px-2.5 py-0.5 bg-sbk-dark text-white text-[10px] font-bold rounded-full uppercase mb-2.5">ROLE 4: QUẢN LÝ</span>
-        <span class="font-bold text-sbk-dark text-sm group-hover:text-sbk-green transition">Admin Executive</span>
-        <span class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Báo cáo doanh thu, biểu đồ phân tích & nhật ký giao dịch tài chính.</span>
-      </a>
+        <!-- Role 3: Admin Executive -->
+        <a href="/admin.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
+          <span class="px-2.5 py-0.5 bg-sbk-dark text-white text-[10px] font-bold rounded-full uppercase mb-2">ROLE 3: QUẢN TRỊ ADMIN</span>
+          <span class="font-black text-sbk-dark text-sm group-hover:text-sbk-green transition">Admin Executive</span>
+          <span class="text-xs text-gray-500 mt-1 leading-relaxed">Báo cáo doanh thu tiền mặt, VietQR, quản lý két tiền và nhật ký giao dịch.</span>
+        </a>
 
+        <!-- Role 4: POS Cashier -->
+        <a href="/pos.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
+          <span class="px-2.5 py-0.5 bg-blue-700 text-white text-[10px] font-bold rounded-full uppercase mb-2">ROLE 4: THU NGÂN POS</span>
+          <span class="font-black text-blue-900 text-sm group-hover:text-sbk-green transition">Thu Ngân Quầy POS</span>
+          <span class="text-xs text-gray-500 mt-1 leading-relaxed">Máy thu ngân quét mã bill Kiosk, nạp tiền thẻ và kiểm tra giao dịch khách hàng.</span>
+        </a>
+
+      </div>
     </div>
 
   </div>
 
-  <script src="/js/portal.js"></script>
+  <script src="/js/portal.js?v=2.4"></script>
 </body>
 </html>

@@ -19,12 +19,13 @@ async function getMenu(req, res, next) {
 
 async function createOrder(req, res, next) {
   try {
-    const { items, cashInsertedBills, paymentMethod, customerPhone } = req.body;
+    const { items, cashInsertedBills, paymentMethod, customerPhone, insertedTotal } = req.body;
     const result = await orderService.processKioskOrder({
       items,
       cashInsertedBills,
       paymentMethod,
-      customerPhone
+      customerPhone,
+      insertedTotal
     });
 
     const io = req.app.get('io');

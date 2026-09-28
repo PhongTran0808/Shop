@@ -22,7 +22,7 @@
       </div>
       <div class="flex items-center gap-4">
         <button id="lang-btn" class="px-3 py-1 bg-sbk-dark text-white rounded-full text-xs font-bold hover:bg-black transition">Tiếng Việt</button>
-        <a href="/" class="text-xs font-bold bg-sbk-gold text-sbk-dark hover:bg-yellow-400 px-3.5 py-1.5 rounded-full transition flex items-center gap-1 shadow">Quay Lại Portal (3 Roles)</a>
+        <a href="/portal" class="text-xs font-bold bg-sbk-gold text-sbk-dark hover:bg-yellow-400 px-3.5 py-1.5 rounded-full transition flex items-center gap-1 shadow">Quay Lại Portal Quản Lý</a>
       </div>
     </header>
 
@@ -218,10 +218,15 @@
         <div id="receipt-details" class="text-sm text-gray-700 space-y-2 border-t border-b border-gray-200 py-3"></div>
         
         <!-- Cash Dispenser Change Output Box -->
-        <div id="receipt-change-box" class="bg-yellow-50/90 p-4 rounded-2xl border border-yellow-300 text-sm hidden shadow-xs">
-          <p class="font-extrabold text-yellow-900 border-b border-yellow-200 pb-1.5 text-xs uppercase tracking-wide">KHAY THỐI TIỀN MẶT LẺ (DISPENSER):</p>
-          <p id="receipt-change-total" class="font-black text-amber-700 text-xl mt-1.5">0 VNĐ</p>
-          <div id="receipt-change-bills" class="text-xs sm:text-sm text-yellow-900 mt-2.5 grid grid-cols-2 gap-2"></div>
+        <div id="receipt-change-box" style="display: none;" class="bg-amber-50/95 p-4 sm:p-5 rounded-2xl border-2 border-amber-300 text-sm shadow-md">
+          <div class="flex items-center justify-between border-b border-amber-200 pb-2">
+            <span class="font-black text-amber-950 text-xs sm:text-sm uppercase tracking-wide flex items-center gap-1.5">
+              <span>💵</span> <span>KHAY THỐI TIỀN MẶT LẺ (DISPENSER):</span>
+            </span>
+            <span id="receipt-change-total" class="font-black text-amber-700 text-xl sm:text-2xl">0 VNĐ</span>
+          </div>
+          <p class="text-xs text-amber-900 font-semibold mt-2">Vui lòng nhận tiền lẻ thối lại tại hộc trả tiền bên dưới:</p>
+          <div id="receipt-change-bills" class="text-xs sm:text-sm text-yellow-950 mt-2.5 grid grid-cols-2 gap-2"></div>
         </div>
       </div>
 
@@ -231,6 +236,6 @@
     </div>
   </div>
 
-  <script src="/js/kiosk.js?v=2.3"></script>
+  <script src="/js/kiosk.js?v=2.4"></script>
 </body>
 </html>
