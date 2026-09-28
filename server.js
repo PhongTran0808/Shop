@@ -11,7 +11,6 @@ const errorHandler = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/authRoutes');
 const kioskRoutes = require('./routes/kioskRoutes');
-const posRoutes = require('./routes/posRoutes');
 const baristaRoutes = require('./routes/baristaRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
@@ -64,7 +63,6 @@ app.get('/api/system/network-info', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/kiosk', kioskRoutes);
-app.use('/api/pos', posRoutes);
 app.use('/api/barista', baristaRoutes);
 app.use('/api/admin', adminRoutes);
 

@@ -1,5 +1,6 @@
 let menuData = [];
 let selectedCategory = 'TẤT CẢ';
+let searchQuery = '';
 let activeProduct = null;
 let selectedSize = 'Grande';
 let selectedIce = '100%';
@@ -9,6 +10,17 @@ let customQty = 1;
 let mobileCart = [];
 let insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
 let activeOrderCode = null;
+
+const categoryIcons = {
+  'TẤT CẢ': '🌟',
+  'Espresso & Cà Phê': '☕',
+  'Cold Brew Ủ Lạnh': '❄️',
+  'Frappuccino®': '🧊',
+  'Sinh Tố Đá Xay': '🍓',
+  'Chocolate & Classics': '🍫',
+  'Starbucks Refreshers™': '🍹',
+  'Trà Teavana™': '🍵'
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchMobileMenu();
@@ -55,10 +67,14 @@ async function fetchMobileMenu() {
   try {
     const res = await fetch('/api/kiosk/menu');
     menuData = await res.json();
+    
+    const countBadge = document.getElementById('hero-menu-count');
+    if (countBadge) countBadge.textContent = menuData.length;
+
     renderCategoryPillBar();
     renderMobileDrinkList();
   } catch (err) {
-    console.error('Lỗi nạp menu mobile:', err);
+    console.error('Lỗi nạp menu:', err);
   }
 }
 
@@ -66,17 +82,21 @@ function renderCategoryPillBar() {
   const container = document.getElementById('mobile-category-bar');
   if (!container) return;
 
-  const categories = ['TẤT CẢ', ...new Set(menuData.map((p) => p.category))];
+  const rawCats = ['TẤT CẢ', ...new Set(menuData.map((p) => p.category))];
 
-  container.innerHTML = categories
+  container.innerHTML = rawCats
     .map((cat) => {
       const isSelected = cat === selectedCategory;
+      const icon = categoryIcons[cat] || '☕';
       return `
-        <button class="mcat-btn px-3 py-1 rounded-full whitespace-nowrap transition border ${
+        <button class="mcat-btn px-3.5 py-1.5 rounded-full whitespace-nowrap transition border font-bold flex items-center gap-1.5 cursor-pointer text-xs ${
           isSelected
-            ? 'bg-sbk-green text-white border-sbk-green shadow-xs'
-            : 'bg-gray-100 text-gray-700 border-gray-200 hover:border-sbk-green hover:text-sbk-green'
-        }" data-cat="${cat}">${cat}</button>
+            ? 'bg-sbk-green text-white border-sbk-green shadow-sm ring-2 ring-sbk-gold/50'
+            : 'bg-white text-gray-700 border-gray-200 hover:border-sbk-green hover:text-sbk-green hover:bg-emerald-50/50'
+        }" data-cat="${cat}">
+          <span>${icon}</span>
+          <span>${cat}</span>
+        </button>
       `;
     })
     .join('');
@@ -94,37 +114,74 @@ function renderMobileDrinkList() {
   const container = document.getElementById('mobile-drink-list');
   const countBadge = document.getElementById('mobile-menu-badge');
 
-  const filtered = selectedCategory === 'TẤT CẢ' ? menuData : menuData.filter((p) => p.category === selectedCategory);
+  let filtered = selectedCategory === 'TẤT CẢ' ? menuData : menuData.filter((p) => p.category === selectedCategory);
+
+  if (searchQuery) {
+    filtered = filtered.filter(
+      (p) =>
+        p.name.toLowerCase().includes(searchQuery) ||
+        p.category.toLowerCase().includes(searchQuery)
+    );
+  }
+
   if (countBadge) countBadge.textContent = `${filtered.length} MÓN`;
 
   if (!container) return;
 
   if (filtered.length === 0) {
-    container.innerHTML = '<p class="col-span-full text-xs text-gray-400 text-center py-12">Không có món nào trong danh mục này</p>';
+    container.innerHTML = `
+      <div class="col-span-full py-16 text-center space-y-2">
+        <div class="text-4xl text-gray-300">🔍</div>
+        <p class="text-sm font-bold text-gray-600">Không tìm thấy món nào</p>
+        <p class="text-xs text-gray-400">Hãy thử tìm kiếm với từ khóa khác hoặc chọn danh mục khác</p>
+      </div>
+    `;
     return;
   }
 
   container.innerHTML = filtered
-    .map(
-      (p) => `
-    <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-sbk-green/60 transition flex flex-col justify-between gap-3 group">
-      <div class="space-y-2">
-        <div class="flex justify-between items-start gap-2">
-          <span class="text-[9px] sm:text-[10px] font-bold text-sbk-green uppercase bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md inline-block">${p.category}</span>
-          <span class="text-xs sm:text-sm font-black text-sbk-green bg-green-50 px-2.5 py-0.5 rounded-full">${p.base_price.toLocaleString('vi-VN')} VNĐ</span>
-        </div>
-        <h3 class="font-black text-xs sm:text-sm text-sbk-dark group-hover:text-sbk-green transition leading-snug line-clamp-2">${p.name}</h3>
-      </div>
+    .map((p) => {
+      const catIcon = categoryIcons[p.category] || '☕';
+      return `
+      <div class="bg-white rounded-3xl border border-gray-200 p-4 sm:p-5 shadow-sm hover:shadow-xl hover:border-sbk-green/60 transition-all duration-200 flex flex-col justify-between gap-3.5 group">
+        
+        <!-- Card Top: Category Icon & Tag + Price Badge -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-sbk-green uppercase bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+              <span>${catIcon}</span>
+              <span class="truncate max-w-[130px]">${p.category}</span>
+            </span>
+            <span class="text-xs sm:text-sm font-black text-sbk-dark bg-sbk-light border border-sbk-green/30 px-3 py-1 rounded-full font-mono">
+              ${p.base_price.toLocaleString('vi-VN')}đ
+            </span>
+          </div>
 
-      <div class="pt-2.5 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
-        <span class="text-[10px] text-gray-400 font-medium">Tall • Grande • Venti</span>
-        <button class="open-custom-btn px-4 py-2 bg-sbk-green text-white text-xs font-bold uppercase rounded-xl shadow hover:bg-[#004225] active:scale-95 transition flex items-center gap-1 cursor-pointer shrink-0" data-id="${p.id}">
-          <span>+</span> <span>Tùy Chọn</span>
-        </button>
+          <!-- Cup Illustration / Avatar Box -->
+          <div class="w-full h-24 sm:h-28 rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/60 to-amber-50/40 border border-gray-100 flex items-center justify-center text-3xl sm:text-4xl group-hover:scale-[1.02] transition-transform duration-200">
+            ${catIcon}
+          </div>
+
+          <!-- Drink Name -->
+          <div>
+            <h3 class="font-black text-sm sm:text-base text-sbk-dark group-hover:text-sbk-green transition leading-snug line-clamp-2" title="${p.name}">
+              ${p.name}
+            </h3>
+            <p class="text-[11px] text-gray-400 font-medium mt-1">Tall (354ml) • Grande (473ml) • Venti (591ml)</p>
+          </div>
+        </div>
+
+        <!-- Card Bottom Action -->
+        <div class="pt-3 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
+          <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">Tự chọn size & đá</span>
+          <button class="open-custom-btn px-4 py-2 bg-sbk-green text-white text-xs font-black uppercase rounded-xl shadow hover:bg-[#004225] active:scale-95 transition flex items-center gap-1.5 cursor-pointer shrink-0" data-id="${p.id}">
+            <span>+</span> <span>ĐẶT MÓN</span>
+          </button>
+        </div>
+
       </div>
-    </div>
-  `
-    )
+    `;
+    })
     .join('');
 
   document.querySelectorAll('.open-custom-btn').forEach((btn) => {
@@ -161,8 +218,8 @@ function renderCustomizerOptions() {
   sizeContainer.innerHTML = Object.keys(activeProduct.sizes)
     .map(
       (sz) => `
-    <button class="msize-btn py-2 rounded-xl border text-xs font-bold transition ${
-      selectedSize === sz ? 'bg-sbk-green text-white border-sbk-green' : 'bg-gray-50 text-sbk-dark border-gray-200'
+    <button class="msize-btn py-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
+      selectedSize === sz ? 'bg-sbk-green text-white border-sbk-green shadow-xs' : 'bg-gray-50 text-sbk-dark border-gray-200 hover:border-sbk-green'
     }" data-size="${sz}">
       ${sz} ${activeProduct.sizes[sz] > 0 ? `(+${activeProduct.sizes[sz] / 1000}k)` : ''}
     </button>
@@ -175,8 +232,8 @@ function renderCustomizerOptions() {
   iceContainer.innerHTML = activeProduct.options.ice
     .map(
       (ic) => `
-    <button class="mice-btn py-2 rounded-xl border text-xs font-bold transition ${
-      selectedIce === ic ? 'bg-sbk-green text-white border-sbk-green' : 'bg-gray-50 text-sbk-dark border-gray-200'
+    <button class="mice-btn py-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
+      selectedIce === ic ? 'bg-sbk-green text-white border-sbk-green shadow-xs' : 'bg-gray-50 text-sbk-dark border-gray-200 hover:border-sbk-green'
     }" data-ice="${ic}">${ic}</button>
   `
     )
@@ -187,8 +244,8 @@ function renderCustomizerOptions() {
   sweetContainer.innerHTML = activeProduct.options.sweetness
     .map(
       (sw) => `
-    <button class="msweet-btn py-2 rounded-xl border text-xs font-bold transition ${
-      selectedSweetness === sw ? 'bg-sbk-green text-white border-sbk-green' : 'bg-gray-50 text-sbk-dark border-gray-200'
+    <button class="msweet-btn py-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
+      selectedSweetness === sw ? 'bg-sbk-green text-white border-sbk-green shadow-xs' : 'bg-gray-50 text-sbk-dark border-gray-200 hover:border-sbk-green'
     }" data-sweet="${sw}">${sw}</button>
   `
     )
@@ -199,8 +256,8 @@ function renderCustomizerOptions() {
   milkContainer.innerHTML = activeProduct.options.milk
     .map(
       (m) => `
-    <button class="mmilk-btn py-2 px-1 rounded-xl border text-[11px] font-bold transition ${
-      selectedMilk === m.name ? 'bg-sbk-green text-white border-sbk-green' : 'bg-gray-50 text-sbk-dark border-gray-200'
+    <button class="mmilk-btn py-2.5 px-2 rounded-xl border text-xs font-bold transition cursor-pointer ${
+      selectedMilk === m.name ? 'bg-sbk-green text-white border-sbk-green shadow-xs' : 'bg-gray-50 text-sbk-dark border-gray-200 hover:border-sbk-green'
     }" data-milk="${m.name}">
       ${m.name} ${m.price > 0 ? `(+${m.price / 1000}k)` : ''}
     </button>
@@ -254,7 +311,7 @@ function bindCustomizerEvents() {
 }
 
 function setupEventListeners() {
-  // Steppers
+  // Steppers in customizer
   document.getElementById('qty-minus').addEventListener('click', () => {
     if (customQty > 1) {
       customQty--;
@@ -270,6 +327,37 @@ function setupEventListeners() {
   document.getElementById('close-custom-btn').addEventListener('click', () => {
     document.getElementById('customizer-modal').classList.add('hidden');
   });
+
+  // Search input listeners (Web & Mobile)
+  const searchInput = document.getElementById('search-drink-input');
+  const searchInputMobile = document.getElementById('search-drink-input-mobile');
+  const clearSearchBtn = document.getElementById('clear-search-btn');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      if (clearSearchBtn) {
+        clearSearchBtn.classList.toggle('hidden', searchQuery.length === 0);
+      }
+      renderMobileDrinkList();
+    });
+  }
+
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      searchQuery = '';
+      clearSearchBtn.classList.add('hidden');
+      renderMobileDrinkList();
+    });
+  }
+
+  if (searchInputMobile) {
+    searchInputMobile.addEventListener('input', (e) => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      renderMobileDrinkList();
+    });
+  }
 
   // Confirm add to cart
   document.getElementById('confirm-add-cart-btn').addEventListener('click', () => {
@@ -292,7 +380,7 @@ function setupEventListeners() {
     updateMobileCartBar();
   });
 
-  // Open cart modal
+  // Open cart modal (Mobile)
   document.getElementById('open-cart-btn').addEventListener('click', openCartModal);
   document.getElementById('close-cart-modal-btn').addEventListener('click', closeCartModal);
 
@@ -301,7 +389,18 @@ function setupEventListeners() {
     headerCartBtn.addEventListener('click', openCartModal);
   }
 
-  // Payment Buttons
+  // Desktop Sidebar Checkout Buttons
+  const deskVietQrBtn = document.getElementById('desktop-pay-vietqr-btn');
+  if (deskVietQrBtn) {
+    deskVietQrBtn.addEventListener('click', openMobileVietQR);
+  }
+
+  const deskCashBtn = document.getElementById('desktop-pay-cash-btn');
+  if (deskCashBtn) {
+    deskCashBtn.addEventListener('click', openMobileCash);
+  }
+
+  // Mobile Modal Payment Buttons
   document.getElementById('pay-vietqr-mobile-btn').addEventListener('click', openMobileVietQR);
   document.getElementById('close-mobile-vietqr-btn').addEventListener('click', () => {
     const modal = document.getElementById('mobile-vietqr-modal');
@@ -385,15 +484,92 @@ function updateMobileCartBar() {
   const totalCount = mobileCart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = mobileCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  // Mobile Bottom Bar
   const countEl = document.getElementById('mobile-cart-count');
   if (countEl) countEl.textContent = totalCount;
   const totalEl = document.getElementById('mobile-cart-total');
   if (totalEl) totalEl.textContent = `${totalPrice.toLocaleString('vi-VN')} VNĐ`;
 
+  // Header Badge
   const headerCartBadge = document.getElementById('header-cart-badge');
   if (headerCartBadge) {
     headerCartBadge.textContent = totalCount;
   }
+
+  // Desktop Sidebar
+  const deskBadge = document.getElementById('desktop-cart-badge');
+  if (deskBadge) deskBadge.textContent = `${totalCount} món`;
+
+  const deskSubtotal = document.getElementById('desktop-subtotal');
+  if (deskSubtotal) deskSubtotal.textContent = `${totalPrice.toLocaleString('vi-VN')} VNĐ`;
+
+  const deskTotal = document.getElementById('desktop-cart-total');
+  if (deskTotal) deskTotal.textContent = `${totalPrice.toLocaleString('vi-VN')} VNĐ`;
+
+  const deskEmpty = document.getElementById('desktop-empty-cart');
+  const deskSummary = document.getElementById('desktop-cart-summary');
+
+  if (mobileCart.length === 0) {
+    if (deskEmpty) deskEmpty.classList.remove('hidden');
+    if (deskSummary) deskSummary.classList.add('hidden');
+  } else {
+    if (deskEmpty) deskEmpty.classList.add('hidden');
+    if (deskSummary) deskSummary.classList.remove('hidden');
+  }
+
+  renderDesktopCartItems();
+  renderMobileCartItems();
+}
+
+function renderDesktopCartItems() {
+  const container = document.getElementById('desktop-cart-items');
+  if (!container) return;
+
+  if (mobileCart.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = mobileCart
+    .map((item, idx) => {
+      const itemTotal = item.price * item.quantity;
+      return `
+        <div class="p-3 bg-gray-50 hover:bg-emerald-50/40 rounded-2xl border border-gray-200 transition space-y-2">
+          <div class="flex justify-between items-start gap-2">
+            <div>
+              <p class="font-black text-xs text-sbk-dark leading-snug">${item.name}</p>
+              <p class="text-[10px] text-gray-500 font-medium">Size: ${item.size} • Đá: ${item.options.ice} • Ngọt: ${item.options.sweetness}</p>
+              <p class="text-[10px] text-sbk-green font-medium">${item.options.milk}</p>
+            </div>
+            <button onclick="removeCartItem(${idx})" class="text-gray-400 hover:text-red-500 font-bold text-xs p-1 cursor-pointer transition">✕</button>
+          </div>
+
+          <div class="flex justify-between items-center pt-1 border-t border-gray-200/60">
+            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white text-xs">
+              <button onclick="changeItemQty(${idx}, -1)" class="w-6 h-6 flex items-center justify-center font-bold text-gray-600 hover:bg-gray-100 cursor-pointer">-</button>
+              <span class="w-6 text-center font-bold text-sbk-dark">${item.quantity}</span>
+              <button onclick="changeItemQty(${idx}, 1)" class="w-6 h-6 flex items-center justify-center font-bold text-gray-600 hover:bg-gray-100 cursor-pointer">+</button>
+            </div>
+            <span class="font-black text-xs text-sbk-green font-mono">${itemTotal.toLocaleString('vi-VN')}đ</span>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+function changeItemQty(idx, delta) {
+  if (!mobileCart[idx]) return;
+  mobileCart[idx].quantity += delta;
+  if (mobileCart[idx].quantity <= 0) {
+    mobileCart.splice(idx, 1);
+  }
+  updateMobileCartBar();
+}
+
+function removeCartItem(idx) {
+  mobileCart.splice(idx, 1);
+  updateMobileCartBar();
 }
 
 function openCartModal() {
@@ -413,6 +589,8 @@ function renderMobileCartItems() {
   const container = document.getElementById('cart-modal-items');
   const totalEl = document.getElementById('cart-modal-total');
 
+  if (!container || !totalEl) return;
+
   if (mobileCart.length === 0) {
     container.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">Chưa có món nào trong giỏ hàng</p>';
     totalEl.textContent = '0 VNĐ';
@@ -431,19 +609,13 @@ function renderMobileCartItems() {
           <p class="text-[10px] text-gray-500">Size: ${item.size} | Đá: ${item.options.ice} | Đường: ${item.options.sweetness} | x${item.quantity}</p>
           <p class="font-bold text-sbk-green mt-0.5">${itemTotal.toLocaleString('vi-VN')} VNĐ</p>
         </div>
-        <button onclick="removeMobileItem(${idx})" class="text-red-600 font-bold px-2 py-1 text-xs hover:bg-red-50 rounded">XÓA</button>
+        <button onclick="removeCartItem(${idx})" class="text-red-600 font-bold px-2 py-1 text-xs hover:bg-red-50 rounded cursor-pointer">XÓA</button>
       </div>
     `;
     })
     .join('');
 
   totalEl.textContent = `${total.toLocaleString('vi-VN')} VNĐ`;
-}
-
-function removeMobileItem(idx) {
-  mobileCart.splice(idx, 1);
-  renderMobileCartItems();
-  updateMobileCartBar();
 }
 
 function openMobileVietQR() {
@@ -487,7 +659,7 @@ async function submitMobileVietQROrder() {
     if (!res.ok) {
       if (confirmBtn) {
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+        confirmBtn.innerHTML = 'XÁC NHẬN ĐÃ CHUYỂN TIỀN';
       }
       return alert(data.error || 'Lỗi xử lý đơn hàng VietQR');
     }
@@ -497,15 +669,15 @@ async function submitMobileVietQROrder() {
     qrModal.style.display = 'none';
     if (confirmBtn) {
       confirmBtn.disabled = false;
-      confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+      confirmBtn.innerHTML = 'XÁC NHẬN ĐÃ CHUYỂN TIỀN';
     }
     closeCartModal();
     showMobileReceipt(data);
   } catch (err) {
-    console.error('Lỗi thanh toán VietQR Mobile:', err);
+    console.error('Lỗi thanh toán VietQR:', err);
     if (confirmBtn) {
       confirmBtn.disabled = false;
-      confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+      confirmBtn.innerHTML = 'XÁC NHẬN ĐÃ CHUYỂN TIỀN';
     }
     alert('Lỗi kết nối máy chủ');
   }
@@ -607,7 +779,7 @@ async function submitMobileCashOrder() {
     closeCartModal();
     showMobileReceipt(data);
   } catch (err) {
-    console.error('Lỗi thanh toán tiền mặt Mobile:', err);
+    console.error('Lỗi thanh toán tiền mặt:', err);
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.innerHTML = 'XÁC NHẬN THANH TOÁN';
@@ -658,7 +830,7 @@ function showMobileReceipt(data) {
       ${cashBreakdownHtml}
     `;
 
-    // Handle Mobile Cash Change Box
+    // Handle Cash Change Box
     const changeBox = document.getElementById('mreceipt-change-box');
     if (changeAmount > 0) {
       if (changeBox) {
@@ -699,7 +871,7 @@ function showMobileReceipt(data) {
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
   } catch (err) {
-    console.error('Lỗi hiển thị biên lai mobile:', err);
+    console.error('Lỗi hiển thị biên lai:', err);
     const modal = document.getElementById('mobile-receipt-modal');
     if (modal) {
       modal.classList.remove('hidden');
