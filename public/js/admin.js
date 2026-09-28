@@ -31,17 +31,20 @@ function setupSocket() {
       socket.emit('join_room', 'admin_room');
     });
 
-  socket.on('cashbox_updated', (summary) => {
-    if (summary && summary.acceptor) {
-      renderCashbox(summary);
-    } else {
-      fetchCashboxData();
-    }
-  });
+    socket.on('cashbox_updated', (summary) => {
+      if (summary && summary.acceptor) {
+        renderCashbox(summary);
+      } else {
+        fetchCashboxData();
+      }
+    });
 
-  socket.on('transaction_logged', () => {
-    fetchAuditLogs();
-  });
+    socket.on('transaction_logged', () => {
+      fetchAuditLogs();
+    });
+  } catch (err) {
+    console.warn('Socket error in Admin:', err);
+  }
 }
 
 function getCookie(name) {
