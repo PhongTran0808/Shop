@@ -124,30 +124,23 @@ async function fetchAuditLogs() {
 }
 
 function updateKPIsAndCharts(logs) {
-  let vietqrTotal = 0;
   let cashTotal = 0;
   let orderCount = 0;
 
   logs.forEach((log) => {
-    if (log.note && log.note.includes('VietQR')) {
-      vietqrTotal += log.amount || 0;
-      orderCount++;
-    } else if (log.type === 'DEPOSIT') {
+    if (log.type === 'DEPOSIT' || (log.note && log.note.includes('VietQR'))) {
       cashTotal += log.amount || 0;
       orderCount++;
     }
   });
 
-  if (document.getElementById('vietqr-total')) {
-    document.getElementById('vietqr-total').textContent = `${vietqrTotal.toLocaleString('vi-VN')} VNĐ`;
-  }
   if (document.getElementById('orders-count')) {
     document.getElementById('orders-count').textContent = `${orderCount} Đơn`;
   }
 
   // Update payment distribution chart
   if (paymentChartInstance) {
-    paymentChartInstance.data.datasets[0].data = [cashTotal || 1, vietqrTotal || 1];
+    paymentChartInstance.data.datasets[0].data = [cashTotal || 1];
     paymentChartInstance.update();
   }
 }
@@ -223,7 +216,7 @@ function initCharts() {
     paymentChartInstance = new Chart(payCtx, {
       type: 'doughnut',
       data: {
-        labels: ['Tiền Mặt Kiosk', 'VietQR Transfer'],
+        labels: ['Doanh Thu'],
         datasets: [
           {
             data: [65, 35],
@@ -246,4 +239,3 @@ function initCharts() {
 function setupEventListeners() {
   // Empty as logout and collect actions are removed
 }
-
