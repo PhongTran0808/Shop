@@ -637,10 +637,12 @@ function handleVendingHardwarePrintAndDispense(data) {
   insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
   updateHardwareCashDisplays();
 
-  // Scroll hardware cabinet into view on mobile
+  // On phones the payment area is a separate full-screen mode.
   if (window.innerWidth < 1024) {
+    const paymentBtn = document.getElementById('view-mode-hardware');
+    if (paymentBtn) paymentBtn.click();
     const hwPanel = document.getElementById('vending-hardware-panel');
-    if (hwPanel) hwPanel.scrollIntoView({ behavior: 'smooth' });
+    if (hwPanel) hwPanel.scrollTop = 0;
   }
 }
 
@@ -900,46 +902,51 @@ function setupViewModeSwitcher() {
   const touchscreen = document.getElementById('touchscreen-display');
   const hwPanel = document.getElementById('vending-hardware-panel');
 
-  if (!btnAll || !btnMenu || !btnHw || !touchscreen || !hwPanel) return;
+  if (!btnMenu || !btnHw || !touchscreen || !hwPanel) return;
 
   function setViewMode(mode) {
     playBeepSound();
     // Reset buttons
-    btnAll.className = 'view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition';
-    btnMenu.className = 'view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition';
-    btnHw.className = 'view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition';
+    if (btnAll) btnAll.className = 'view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition';
+    btnMenu.className = 'view-mode-btn px-2 py-1 rounded text-white/80 hover:text-white transition';
+    btnHw.className = 'view-mode-btn px-2 py-1 rounded text-white/80 hover:text-white transition';
+    hwPanel.classList.remove('payment-focus');
 
     if (mode === 'all') {
-      btnAll.className = 'view-mode-btn px-2 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition';
+      if (btnAll) btnAll.className = 'view-mode-btn px-2 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition';
       touchscreen.classList.remove('hidden');
       touchscreen.classList.remove('h-full');
       touchscreen.classList.add('h-[46%]');
 
       hwPanel.classList.remove('hidden');
+      hwPanel.classList.add('flex');
       hwPanel.classList.remove('h-full');
       hwPanel.classList.add('h-[54%]');
     } else if (mode === 'menu') {
-      btnMenu.className = 'view-mode-btn px-2 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition';
+      btnMenu.className = 'view-mode-btn px-2 py-1 rounded bg-white text-sbk-green font-black shadow-2xs transition';
       touchscreen.classList.remove('hidden');
       touchscreen.classList.remove('h-[46%]');
       touchscreen.classList.add('h-full');
 
       hwPanel.classList.add('hidden');
+      hwPanel.classList.remove('flex');
       hwPanel.classList.remove('h-[54%]');
       hwPanel.classList.remove('h-full');
     } else if (mode === 'hardware') {
-      btnHw.className = 'view-mode-btn px-2 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition';
+      btnHw.className = 'view-mode-btn px-2 py-1 rounded bg-white text-sbk-green font-black shadow-2xs transition';
       touchscreen.classList.add('hidden');
       touchscreen.classList.remove('h-[46%]');
       touchscreen.classList.remove('h-full');
 
       hwPanel.classList.remove('hidden');
+      hwPanel.classList.add('flex');
       hwPanel.classList.remove('h-[54%]');
       hwPanel.classList.add('h-full');
+      hwPanel.classList.add('payment-focus');
     }
   }
 
-  btnAll.addEventListener('click', () => setViewMode('all'));
+  if (btnAll) btnAll.addEventListener('click', () => setViewMode('all'));
   btnMenu.addEventListener('click', () => setViewMode('menu'));
   btnHw.addEventListener('click', () => setViewMode('hardware'));
 }
@@ -992,8 +999,10 @@ function removeCartItem(idx) {
 
 function copyOrderLink() {
   playBeepSound();
-  const isVercel = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-  const orderUrl = isVercel ? `${window.location.origin}/order` : 'https://shop-git-main-univer3.vercel.app/order';
+  // Always use the origin currently serving this page.  The old localhost
+  // fallback pointed at a different Vercel deployment and made shared links
+  // open the portal/role selector instead of the customer order screen.
+  const orderUrl = new URL('/order', window.location.origin).href;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(orderUrl)
       .then(showCopyToast)

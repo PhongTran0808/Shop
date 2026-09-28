@@ -30,18 +30,14 @@
         </div>
       </div>
 
-      <!-- Mobile View Switcher (Visible on Mobile only: Chuyển đổi xem Toàn Cục / Menu / Nạp Tiền) -->
+      <!-- Phone mode switcher: one full-screen work area at a time. -->
       <div class="lg:hidden flex items-center bg-black/40 p-0.5 rounded-lg text-[8px] font-bold border border-white/10">
-        <button id="view-mode-all" class="view-mode-btn px-1.5 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition">Toàn Cục</button>
-        <button id="view-mode-menu" class="view-mode-btn px-1 py-0.5 rounded text-white/80 hover:text-white transition">Menu</button>
-        <button id="view-mode-hardware" class="view-mode-btn px-1 py-0.5 rounded text-white/80 hover:text-white transition">Nạp Tiền</button>
+        <button id="view-mode-menu" class="view-mode-btn px-2 py-1 rounded bg-white text-sbk-green font-black shadow-2xs transition">MÓN</button>
+        <button id="view-mode-hardware" class="view-mode-btn px-2 py-1 rounded text-white/80 hover:text-white transition">THANH TOÁN</button>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-1 sm:gap-2">
-        <a href="/portal" class="text-[8.5px] sm:text-[10px] font-bold bg-sbk-gold hover:bg-yellow-400 text-sbk-dark px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full transition flex items-center gap-0.5 shadow cursor-pointer">
-          <span>🏛️</span> <span class="hidden sm:inline">Portal</span>
-        </a>
         <button id="copy-order-link-btn" class="hidden sm:inline-flex text-[10px] font-bold bg-white/10 hover:bg-white/20 active:scale-95 text-white px-2 py-1 rounded-full border border-white/20 transition items-center gap-1 cursor-pointer">
           <span>📋</span> <span>Sao chép</span>
         </button>
@@ -63,7 +59,7 @@
       <!-- ======================================================== -->
       <!-- SECTION 1: TOUCHSCREEN DISPLAY (MÀN HÌNH CHỌN MÓN)       -->
       <!-- ======================================================== -->
-      <div id="touchscreen-display" class="h-[46%] lg:h-full lg:col-span-7 xl:col-span-8 bg-[#f8fafc] text-slate-800 flex flex-col border-b-2 lg:border-b-0 lg:border-r-2 border-slate-300 p-2 sm:p-3 lg:p-4 overflow-hidden relative min-h-0">
+      <div id="touchscreen-display" class="h-full lg:h-full lg:col-span-7 xl:col-span-8 bg-[#f8fafc] text-slate-800 flex flex-col border-b-2 lg:border-b-0 lg:border-r-2 border-slate-300 p-2 sm:p-3 lg:p-4 overflow-hidden relative min-h-0">
         
         <!-- Screen Top Bar: Search & Categories -->
         <div class="space-y-1 sm:space-y-2 shrink-0">
@@ -222,7 +218,7 @@
       <!-- ======================================================== -->
       <!-- SECTION 2: PHYSICAL HARDWARE SIMULATION (DARK METALLIC)  -->
       <!-- ======================================================== -->
-      <div id="vending-hardware-panel" class="h-[54%] lg:h-full lg:col-span-5 xl:col-span-4 bg-brushed-dark text-slate-200 p-2 sm:p-3 lg:p-4 flex flex-col justify-between overflow-y-auto lg:overflow-hidden min-h-0 relative border-l border-gray-800 shadow-2xl">
+      <div id="vending-hardware-panel" class="hidden lg:flex h-full lg:h-full lg:col-span-5 xl:col-span-4 bg-brushed-dark text-slate-200 p-2 sm:p-3 lg:p-4 flex-col justify-between overflow-y-auto lg:overflow-hidden min-h-0 relative border-l border-gray-800 shadow-2xl">
         
         <!-- Hardware Header: Golden Metallic Title -->
         <div class="text-center pt-0 pb-0.5 border-b border-gray-700/50 shrink-0">

@@ -20,11 +20,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+function sendPage(res, filename) {
+  // Prevent a browser/proxy from keeping an older portal or order shell after
+  // a deployment. Static assets still remain cacheable via their versioned
+  // URLs, while these entry pages must always reflect the active deployment.
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.sendFile(path.join(__dirname, 'views', filename));
+}
+
+app.get('/', (req, res) => {
+  sendPage(res, 'index.html');
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
 
 app.get('/order', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'mobile.html'));
+  sendPage(res, 'mobile.html');
 });
 
 app.get('/kiosk', (req, res) => {
@@ -36,7 +48,7 @@ app.get('/kiosk.html', (req, res) => {
 });
 
 app.get('/portal', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  sendPage(res, 'index.html');
 });
 
 app.get('/api/qr', (req, res) => {

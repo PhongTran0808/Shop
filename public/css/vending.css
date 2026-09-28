@@ -176,3 +176,95 @@
 .animate-bill-insert {
   animation: billInsert 0.35s ease-in forwards;
 }
+
+/* Phone layout: the order screen is one fixed viewport. The menu and the
+   hardware controls share the viewport; neither should push the payment
+   controls below the browser's visible area. */
+@media (max-width: 1023px) {
+  #kiosk-main-split {
+    min-height: 0;
+  }
+
+  #vending-hardware-panel {
+    overflow: hidden !important;
+    gap: 2px;
+    padding: 4px !important;
+  }
+
+  #vending-hardware-panel.payment-focus {
+    overflow-y: auto !important;
+    justify-content: flex-start;
+  }
+
+  /* Payment mode shows the whole bill and return tray. The panel may scroll,
+     but neither action is clipped inside a short phone viewport. */
+  #vending-hardware-panel.payment-focus #receipt-exit-area,
+  #vending-hardware-panel.payment-focus #change-dispenser-tray {
+    min-height: 220px !important;
+    max-height: 280px !important;
+  }
+
+  #vending-hardware-panel.payment-focus #vending-receipt {
+    min-height: 205px;
+    max-height: 265px;
+  }
+
+  #vending-hardware-panel.payment-focus #receipt-items-list {
+    max-height: 76px !important;
+    overflow-y: auto !important;
+  }
+
+  #vending-hardware-panel > .bg-recessed-niche {
+    margin: 0 !important;
+    padding: 4px !important;
+  }
+
+  #receipt-exit-area,
+  #change-dispenser-tray {
+    min-height: 58px !important;
+    max-height: 72px !important;
+  }
+
+  #receipt-idle-state,
+  #receipt-torn-status {
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+  }
+
+  /* Keep the tear action visible even when a receipt has several line items. */
+  #vending-receipt {
+    min-height: 62px;
+    max-height: 70px;
+    overflow: hidden;
+    padding-bottom: 18px !important;
+  }
+
+  #receipt-items-list {
+    max-height: 18px !important;
+    overflow: hidden !important;
+  }
+
+  #tear-cue-banner {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    bottom: 2px;
+    z-index: 3;
+    margin: 0 !important;
+  }
+
+  #vending-hardware-panel > .bg-\[\#16191f\] {
+    padding: 4px !important;
+    gap: 3px !important;
+  }
+
+  #vending-hardware-panel .vbill-btn {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+  }
+
+  #vending-submit-pay-btn {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+  }
+}
