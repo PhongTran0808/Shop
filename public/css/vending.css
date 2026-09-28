@@ -177,6 +177,40 @@
   animation: billInsert 0.35s ease-in forwards;
 }
 
+/* Keep receipt/change controls usable when their contents are long. The
+   hardware bay stays at the top; only the long list inside each bay scrolls.
+   This prevents the collect button or receipt action from being pushed out of
+   the visible machine frame. */
+#receipt-exit-area,
+#change-dispenser-tray {
+  min-height: 0;
+}
+
+#vending-receipt {
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#receipt-torn-status {
+  flex-shrink: 0;
+}
+
+#change-tray-contents {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#change-collect-box {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  padding-top: 2px;
+  background: #0f1115;
+}
+
 /* Phone layout: the order screen is one fixed viewport. The menu and the
    hardware controls share the viewport; neither should push the payment
    controls below the browser's visible area. */
