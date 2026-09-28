@@ -24,16 +24,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
 
-const pems = selfsigned.generate(
-  [
-    { name: 'commonName', value: 'localhost' },
-    { name: 'organizationName', value: 'Starbucks Local Kiosk' }
-  ],
-  { days: 365, keySize: 2048 }
-);
-
 app.get('/api/qr', (req, res) => {
-  const text = req.query.text || 'https://localhost:7001';
+  const host = req.get('host') || 'localhost:7001';
+  const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+  const defaultUrl = `${protocol}://${host}`;
+  const text = req.query.text || defaultUrl;
   try {
     const qrcode = require('qrcode');
     res.setHeader('Content-Type', 'image/png');
@@ -48,11 +43,14 @@ app.get('/api/qr', (req, res) => {
 
 app.get('/api/system/network-info', (req, res) => {
   const lanIp = getLanIp();
+  const host = req.get('host') || `${lanIp}:7001`;
+  const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+  const baseUrl = `${protocol}://${host}`;
   res.json({
     lanIp,
-    localUrl: `https://localhost:${HTTPS_PORT}`,
-    lanUrl: `https://${lanIp}:${HTTPS_PORT}`,
-    mobileUrl: `https://${lanIp}:${HTTPS_PORT}/mobile.html`
+    localUrl: baseUrl,
+    lanUrl: baseUrl,
+    mobileUrl: `${baseUrl}/mobile.html`
   });
 });
 
@@ -64,44 +62,61 @@ app.use('/api/admin', adminRoutes);
 
 app.use(errorHandler);
 
-const httpsOptions = {
-  key: pems.private,
-  cert: pems.cert
-};
+// Support both Local standalone server (HTTPS/Socket.IO) and Vercel serverless
+if (require.main === module) {
+  const pems = selfsigned.generate(
+    [
+      { name: 'commonName', value: 'localhost' },
+      { name: 'organizationName', value: 'Starbucks Local Kiosk' }
+    ],
+    { days: 365, keySize: 2048 }
+  );
 
-const httpsServer = https.createServer(httpsOptions, app);
-const io = new Server(httpsServer, {
-  cors: { origin: '*' }
-});
+  const httpsOptions = {
+    key: pems.private,
+    cert: pems.cert
+  };
 
-app.set('io', io);
-
-io.use((socket, next) => {
-  socket.user = { role: 'ADMIN' }; // Passwordless 1-click full access
-  next();
-});
-
-io.on('connection', (socket) => {
-  socket.on('join_room', (roomName) => {
-    socket.join(roomName);
+  const httpsServer = https.createServer(httpsOptions, app);
+  const io = new Server(httpsServer, {
+    cors: { origin: '*' }
   });
-});
 
-const HTTPS_PORT = 7001;
-httpsServer.listen(HTTPS_PORT, '0.0.0.0', () => {
-  const lanIp = getLanIp();
-  console.log('====================================================');
-  console.log(`☕ Starbucks Smart Kiosk Server Running (HTTPS)`);
-  console.log(`► Local Server: https://localhost:${HTTPS_PORT}`);
-  console.log(`► LAN Server:   https://${lanIp}:${HTTPS_PORT}`);
-  console.log('====================================================');
-});
+  app.set('io', io);
 
-const HTTP_PORT = 7000;
-http
-  .createServer((req, res) => {
-    const host = req.headers.host ? req.headers.host.split(':')[0] : 'localhost';
-    res.writeHead(301, { Location: `https://${host}:${HTTPS_PORT}${req.url}` });
-    res.end();
-  })
-  .listen(HTTP_PORT);
+  io.use((socket, next) => {
+    socket.user = { role: 'ADMIN' };
+    next();
+  });
+
+  io.on('connection', (socket) => {
+    socket.on('join_room', (roomName) => {
+      socket.join(roomName);
+    });
+  });
+
+  const HTTPS_PORT = process.env.PORT || 7001;
+  httpsServer.listen(HTTPS_PORT, '0.0.0.0', () => {
+    const lanIp = getLanIp();
+    console.log('====================================================');
+    console.log(`☕ Starbucks Smart Kiosk Server Running (HTTPS)`);
+    console.log(`► Local Server: https://localhost:${HTTPS_PORT}`);
+    console.log(`► LAN Server:   https://${lanIp}:${HTTPS_PORT}`);
+    console.log('====================================================');
+  });
+
+  const HTTP_PORT = 7000;
+  try {
+    http
+      .createServer((req, res) => {
+        const host = req.headers.host ? req.headers.host.split(':')[0] : 'localhost';
+        res.writeHead(301, { Location: `https://${host}:${HTTPS_PORT}${req.url}` });
+        res.end();
+      })
+      .listen(HTTP_PORT);
+  } catch (err) {
+    // Port 7000 optional
+  }
+}
+
+module.exports = app;
