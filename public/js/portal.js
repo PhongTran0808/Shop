@@ -1,9 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // Target URL for customer ordering mode (Order Only)
-  const isVercelOrRemote = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-  const targetUrl = isVercelOrRemote
-    ? `${window.location.origin}/order`
-    : 'https://shop-git-main-univer3.vercel.app/order';
+  const targetUrl = `${window.location.origin}/order`;
 
   const badge = document.getElementById('qr-url-badge');
   if (badge) {

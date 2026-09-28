@@ -40,7 +40,7 @@ app.get('/portal', (req, res) => {
 });
 
 app.get('/api/qr', (req, res) => {
-  const host = req.get('host') || 'shop-git-main-univer3.vercel.app';
+  const host = req.get('host') || 'shop-ten-drab-87.vercel.app';
   const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
   const defaultUrl = `${protocol}://${host}/order`;
   const text = req.query.text || defaultUrl;
@@ -58,9 +58,9 @@ app.get('/api/qr', (req, res) => {
 
 app.get('/api/system/network-info', (req, res) => {
   const lanIp = getLanIp();
-  const host = req.get('host') || 'shop-git-main-univer3.vercel.app';
+  const host = req.get('host') || 'shop-ten-drab-87.vercel.app';
   const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-  const baseUrl = host.includes('localhost') ? 'https://shop-git-main-univer3.vercel.app' : `${protocol}://${host}`;
+  const baseUrl = host.includes('localhost') ? `${protocol}://${host}` : `${protocol}://${host}`;
   res.json({
     lanIp,
     localUrl: `${baseUrl}/portal`,
