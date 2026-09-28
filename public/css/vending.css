@@ -211,6 +211,28 @@
   background: #0f1115;
 }
 
+/* Desktop / laptop order view: always restore the original two-column kiosk
+   cabinet. This rule is intentionally desktop-only so the phone order view
+   keeps its MÓN / THANH TOÁN full-screen behavior. */
+@media (min-width: 1024px) {
+  #kiosk-main-split {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  #touchscreen-display {
+    display: flex !important;
+    grid-column: span 7 / span 7;
+    height: 100% !important;
+  }
+
+  #vending-hardware-panel {
+    display: flex !important;
+    grid-column: span 5 / span 5;
+    height: 100% !important;
+  }
+}
+
 /* Phone layout: the order screen is one fixed viewport. The menu and the
    hardware controls share the viewport; neither should push the payment
    controls below the browser's visible area. */
