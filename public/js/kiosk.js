@@ -328,10 +328,15 @@ function setupEventListeners() {
 
   // Receipt modal finish button
   document.getElementById('finish-receipt-btn').addEventListener('click', () => {
-    document.getElementById('receipt-modal').classList.add('hidden');
+    const modal = document.getElementById('receipt-modal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
     const slot = document.getElementById('visual-dispenser-slot');
     const sensorText = document.getElementById('sensor-text');
-    if (slot) slot.classList.add('hidden');
+    if (slot) {
+      slot.classList.add('hidden');
+      slot.style.display = 'none';
+    }
     if (sensorText) sensorText.textContent = 'CẢM BIẾN KIOSK: SẴN SÀNG NHẬN TIỀN & THỐI TIỀN LẺ';
     cart = [];
     renderCart();
@@ -376,11 +381,20 @@ function removeItem(idx) {
 function openCashModal() {
   insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
   updateCashModalDisplay();
-  document.getElementById('cash-modal').classList.remove('hidden');
+  const modal = document.getElementById('cash-modal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
 }
 
 function closeCashModal() {
-  document.getElementById('cash-modal').classList.add('hidden');
+  const modal = document.getElementById('cash-modal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
+  const submitBtn = document.getElementById('submit-cash-order-btn');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = 'XÁC NHẬN THANH TOÁN & THỐI TIỀN LẺ';
+  }
 }
 
 function calculateInsertedTotal() {
@@ -417,6 +431,20 @@ async function submitCashOrder() {
     return alert(`Số tiền nạp chưa đủ. Còn thiếu ${(cartTotal - insertedTotal).toLocaleString('vi-VN')} VNĐ`);
   }
 
+  const submitBtn = document.getElementById('submit-cash-order-btn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+      <span class="inline-flex items-center gap-2">
+        <svg class="animate-spin h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span>ĐANG XỬ LÝ THANH TOÁN & THỐI TIỀN...</span>
+      </span>
+    `;
+  }
+
   const payload = {
     items: cart,
     cashInsertedBills: insertedBills,
@@ -434,11 +462,22 @@ async function submitCashOrder() {
     });
 
     const data = await res.json();
-    if (!res.ok) return alert(data.error || 'Lỗi xử lý đơn hàng');
+    if (!res.ok) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'XÁC NHẬN THANH TOÁN & THỐI TIỀN LẺ';
+      }
+      return alert(data.error || 'Lỗi xử lý đơn hàng');
+    }
 
     closeCashModal();
     showReceiptModal(data);
   } catch (err) {
+    console.error('Lỗi thanh toán tiền mặt:', err);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'XÁC NHẬN THANH TOÁN & THỐI TIỀN LẺ';
+    }
     alert('Lỗi kết nối máy chủ');
   }
 }
@@ -460,14 +499,29 @@ function openVietQRModal() {
   img.src = vietqrUrl;
   img.onerror = () => { img.alt = 'Không tải được QR. Vui lòng nhập STK thủ công.'; };
 
-  document.getElementById('vietqr-modal').classList.remove('hidden');
+  const modal = document.getElementById('vietqr-modal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
 }
 
 function closeVietQRModal() {
-  document.getElementById('vietqr-modal').classList.add('hidden');
+  const modal = document.getElementById('vietqr-modal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
+  const confirmBtn = document.getElementById('confirm-vietqr-btn');
+  if (confirmBtn) {
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+  }
 }
 
 async function confirmVietQROrder() {
+  const confirmBtn = document.getElementById('confirm-vietqr-btn');
+  if (confirmBtn) {
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '⏳ ĐANG XÁC NHẬN ĐƠN HÀNG...';
+  }
+
   const payload = {
     items: cart,
     paymentMethod: 'VIETQR'
@@ -484,65 +538,103 @@ async function confirmVietQROrder() {
     });
 
     const data = await res.json();
-    if (!res.ok) return alert(data.error || 'Lỗi xử lý đơn hàng VietQR');
+    if (!res.ok) {
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+      }
+      return alert(data.error || 'Lỗi xử lý đơn hàng VietQR');
+    }
 
     closeVietQRModal();
     showReceiptModal(data);
   } catch (err) {
+    console.error('Lỗi thanh toán VietQR:', err);
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+    }
     alert('Lỗi kết nối máy chủ');
   }
 }
 
 function showReceiptModal(data) {
-  document.getElementById('receipt-order-code').textContent = data.order.order_code;
+  try {
+    document.getElementById('receipt-order-code').textContent = data.order ? data.order.order_code : '#SBK';
 
-  let itemsSummary = '';
-  if (data.order && data.order.items) {
-    const items = typeof data.order.items === 'string' ? JSON.parse(data.order.items) : data.order.items;
-    itemsSummary = items.map((i) => `<p>• ${i.name} [Size: ${i.size}] x${i.quantity || 1}</p>`).join('');
-  }
-
-  const payMethodText = data.paymentMethod === 'VIETQR' ? 'Chuyển khoản VietQR' : 'Tiền mặt Kiosk';
-
-  document.getElementById('receipt-details').innerHTML = `
-    <div class="mb-2 font-bold text-sbk-green">PHƯƠNG THỨC: ${payMethodText}</div>
-    ${itemsSummary}
-    <div class="border-t border-gray-200 pt-2 mt-2 font-bold flex justify-between">
-      <span>TỔNG TIỀN:</span>
-      <span class="text-sbk-green">${data.calculatedTotal.toLocaleString('vi-VN')} VNĐ</span>
-    </div>
-  `;
-
-  // Handle cash change dispenser UI box & visual animation
-  const changeBox = document.getElementById('receipt-change-box');
-  const hardwareChangeDisplay = document.getElementById('cash-change-display');
-
-  if (data.changeAmount > 0) {
-    changeBox.classList.remove('hidden');
-    document.getElementById('receipt-change-total').textContent = `Thối lại: ${data.changeAmount.toLocaleString('vi-VN')} VNĐ`;
-
-    const bills = data.changeBills || {};
-    const billsFormatted = Object.keys(bills)
-      .filter((k) => bills[k] > 0)
-      .map((k) => `<span>• Tờ ${k}: <strong>${bills[k]} tờ</strong></span>`)
-      .join('');
-
-    document.getElementById('receipt-change-bills').innerHTML = billsFormatted || '<span>Nhả tiền mặt lẻ tại khay</span>';
-    if (hardwareChangeDisplay) {
-      hardwareChangeDisplay.textContent = `${data.changeAmount.toLocaleString('vi-VN')} VNĐ`;
+    let itemsSummary = '';
+    if (data.order && data.order.items) {
+      const items = typeof data.order.items === 'string' ? JSON.parse(data.order.items) : data.order.items;
+      itemsSummary = items.map((i) => `<p>• ${i.name} [Size: ${i.size}] x${i.quantity || 1}</p>`).join('');
     }
 
-    animateCashDispense(data.changeBills, data.changeAmount);
-  } else {
-    changeBox.classList.add('hidden');
-    if (hardwareChangeDisplay) {
-      hardwareChangeDisplay.textContent = '0 VNĐ';
-    }
-    const slot = document.getElementById('visual-dispenser-slot');
-    if (slot) slot.classList.add('hidden');
-  }
+    const payMethodText = data.paymentMethod === 'VIETQR' ? 'Chuyển khoản VietQR' : 'Tiền mặt Kiosk';
+    const totalAmount = data.calculatedTotal || (data.order ? data.order.total_amount : 0);
 
-  document.getElementById('receipt-modal').classList.remove('hidden');
+    document.getElementById('receipt-details').innerHTML = `
+      <div class="mb-2 font-bold text-sbk-green">PHƯƠNG THỨC: ${payMethodText}</div>
+      ${itemsSummary}
+      <div class="border-t border-gray-200 pt-2 mt-2 font-bold flex justify-between">
+        <span>TỔNG TIỀN:</span>
+        <span class="text-sbk-green">${totalAmount.toLocaleString('vi-VN')} VNĐ</span>
+      </div>
+    `;
+
+    // Handle cash change dispenser UI box & visual animation
+    const changeBox = document.getElementById('receipt-change-box');
+    const hardwareChangeDisplay = document.getElementById('cash-change-display');
+
+    if (data.changeAmount > 0) {
+      if (changeBox) {
+        changeBox.classList.remove('hidden');
+        changeBox.style.display = 'block';
+      }
+      const changeTotalEl = document.getElementById('receipt-change-total');
+      if (changeTotalEl) {
+        changeTotalEl.textContent = `Thối lại: ${data.changeAmount.toLocaleString('vi-VN')} VNĐ`;
+      }
+
+      const bills = data.changeBills || {};
+      const billsFormatted = Object.keys(bills)
+        .filter((k) => bills[k] > 0)
+        .map((k) => `<span>• Tờ ${k}: <strong>${bills[k]} tờ</strong></span>`)
+        .join('');
+
+      const billsEl = document.getElementById('receipt-change-bills');
+      if (billsEl) {
+        billsEl.innerHTML = billsFormatted || '<span>Nhả tiền mặt lẻ tại khay</span>';
+      }
+      if (hardwareChangeDisplay) {
+        hardwareChangeDisplay.textContent = `${data.changeAmount.toLocaleString('vi-VN')} VNĐ`;
+      }
+
+      animateCashDispense(data.changeBills, data.changeAmount);
+    } else {
+      if (changeBox) {
+        changeBox.classList.add('hidden');
+        changeBox.style.display = 'none';
+      }
+      if (hardwareChangeDisplay) {
+        hardwareChangeDisplay.textContent = '0 VNĐ';
+      }
+      const slot = document.getElementById('visual-dispenser-slot');
+      if (slot) {
+        slot.classList.add('hidden');
+        slot.style.display = 'none';
+      }
+    }
+
+    const receiptModal = document.getElementById('receipt-modal');
+    receiptModal.classList.remove('hidden');
+    receiptModal.style.display = 'flex';
+  } catch (err) {
+    console.error('Lỗi hiển thị receipt modal:', err);
+    const receiptModal = document.getElementById('receipt-modal');
+    if (receiptModal) {
+      receiptModal.classList.remove('hidden');
+      receiptModal.style.display = 'flex';
+    }
+  }
 }
 
 function animateCashDispense(changeBills, changeAmount) {

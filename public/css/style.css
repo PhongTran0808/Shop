@@ -1,5 +1,9 @@
 @import "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
 
+.hidden {
+  display: none !important;
+}
+
 :root {
   --sbk-green: #006241;
   --sbk-dark: #1e3932;

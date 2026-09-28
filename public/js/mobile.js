@@ -294,13 +294,17 @@ function setupEventListeners() {
   // Payment Buttons
   document.getElementById('pay-vietqr-mobile-btn').addEventListener('click', openMobileVietQR);
   document.getElementById('close-mobile-vietqr-btn').addEventListener('click', () => {
-    document.getElementById('mobile-vietqr-modal').classList.add('hidden');
+    const modal = document.getElementById('mobile-vietqr-modal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
   });
   document.getElementById('confirm-mobile-vietqr-btn').addEventListener('click', submitMobileVietQROrder);
 
   document.getElementById('pay-cash-mobile-btn').addEventListener('click', openMobileCash);
   document.getElementById('close-mobile-cash-btn').addEventListener('click', () => {
-    document.getElementById('mobile-cash-modal').classList.add('hidden');
+    const modal = document.getElementById('mobile-cash-modal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
   });
 
   document.querySelectorAll('.mbill-btn').forEach((btn) => {
@@ -314,7 +318,9 @@ function setupEventListeners() {
   document.getElementById('submit-mobile-cash-btn').addEventListener('click', submitMobileCashOrder);
 
   document.getElementById('finish-mobile-receipt-btn').addEventListener('click', () => {
-    document.getElementById('mobile-receipt-modal').classList.add('hidden');
+    const modal = document.getElementById('mobile-receipt-modal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
     mobileCart = [];
     updateMobileCartBar();
   });
@@ -330,11 +336,15 @@ function updateMobileCartBar() {
 
 function openCartModal() {
   renderMobileCartItems();
-  document.getElementById('cart-modal').classList.remove('hidden');
+  const modal = document.getElementById('cart-modal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
 }
 
 function closeCartModal() {
-  document.getElementById('cart-modal').classList.add('hidden');
+  const modal = document.getElementById('cart-modal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
 }
 
 function renderMobileCartItems() {
@@ -384,10 +394,18 @@ function openMobileVietQR() {
   const qrString = `00020101021238570010A0000007270127000697042201130900112233440208QRIBFTTA5303704540${cartTotal}5802VN62150811STARBUCKS6304`;
   QRCode.toCanvas(canvas, qrString, { width: 140, margin: 1 });
 
-  document.getElementById('mobile-vietqr-modal').classList.remove('hidden');
+  const modal = document.getElementById('mobile-vietqr-modal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
 }
 
 async function submitMobileVietQROrder() {
+  const confirmBtn = document.getElementById('confirm-mobile-vietqr-btn');
+  if (confirmBtn) {
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '⏳ ĐANG XỬ LÝ...';
+  }
+
   const payload = {
     items: mobileCart,
     paymentMethod: 'VIETQR'
@@ -404,12 +422,29 @@ async function submitMobileVietQROrder() {
     });
 
     const data = await res.json();
-    if (!res.ok) return alert(data.error || 'Lỗi xử lý đơn hàng VietQR');
+    if (!res.ok) {
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+      }
+      return alert(data.error || 'Lỗi xử lý đơn hàng VietQR');
+    }
 
-    document.getElementById('mobile-vietqr-modal').classList.add('hidden');
+    const qrModal = document.getElementById('mobile-vietqr-modal');
+    qrModal.classList.add('hidden');
+    qrModal.style.display = 'none';
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+    }
     closeCartModal();
     showMobileReceipt(data);
   } catch (err) {
+    console.error('Lỗi thanh toán VietQR Mobile:', err);
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '✅ XÁC NHẬN ĐÃ CHUYỂN TIỀN';
+    }
     alert('Lỗi kết nối máy chủ');
   }
 }
@@ -418,7 +453,9 @@ function openMobileCash() {
   if (mobileCart.length === 0) return alert('Vui lòng chọn món trước khi thanh toán');
   insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
   updateMobileCashDisplay();
-  document.getElementById('mobile-cash-modal').classList.remove('hidden');
+  const modal = document.getElementById('mobile-cash-modal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
 }
 
 function updateMobileCashDisplay() {
@@ -458,6 +495,20 @@ async function submitMobileCashOrder() {
     return alert(`Số tiền nạp chưa đủ. Còn thiếu ${(cartTotal - insertedTotal).toLocaleString('vi-VN')} VNĐ`);
   }
 
+  const submitBtn = document.getElementById('submit-mobile-cash-btn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+      <span class="inline-flex items-center gap-2">
+        <svg class="animate-spin h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span>ĐANG XỬ LÝ THANH TOÁN...</span>
+      </span>
+    `;
+  }
+
   const payload = {
     items: mobileCart,
     cashInsertedBills: insertedBills,
@@ -475,39 +526,68 @@ async function submitMobileCashOrder() {
     });
 
     const data = await res.json();
-    if (!res.ok) return alert(data.error || 'Lỗi xử lý đơn hàng tiền mặt');
+    if (!res.ok) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'XÁC NHẬN THANH TOÁN';
+      }
+      return alert(data.error || 'Lỗi xử lý đơn hàng tiền mặt');
+    }
 
-    document.getElementById('mobile-cash-modal').classList.add('hidden');
+    const cashModal = document.getElementById('mobile-cash-modal');
+    cashModal.classList.add('hidden');
+    cashModal.style.display = 'none';
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'XÁC NHẬN THANH TOÁN';
+    }
     closeCartModal();
     showMobileReceipt(data);
   } catch (err) {
+    console.error('Lỗi thanh toán tiền mặt Mobile:', err);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'XÁC NHẬN THANH TOÁN';
+    }
     alert('Lỗi kết nối máy chủ');
   }
 }
 
 function showMobileReceipt(data) {
-  activeOrderCode = data.order.order_code;
-  document.getElementById('mreceipt-order-code').textContent = activeOrderCode;
+  try {
+    activeOrderCode = data.order ? data.order.order_code : '#SBK';
+    document.getElementById('mreceipt-order-code').textContent = activeOrderCode;
 
-  let itemsSummary = '';
-  if (data.order && data.order.items) {
-    const items = typeof data.order.items === 'string' ? JSON.parse(data.order.items) : data.order.items;
-    itemsSummary = items.map((i) => `<p>• ${i.name} (Size ${i.size}) x${i.quantity || 1}</p>`).join('');
+    let itemsSummary = '';
+    if (data.order && data.order.items) {
+      const items = typeof data.order.items === 'string' ? JSON.parse(data.order.items) : data.order.items;
+      itemsSummary = items.map((i) => `<p>• ${i.name} (Size ${i.size}) x${i.quantity || 1}</p>`).join('');
+    }
+
+    const payMethodText = data.paymentMethod === 'VIETQR' ? 'Chuyển khoản VietQR' : 'Tiền mặt Kiosk';
+    const totalAmount = data.calculatedTotal || (data.order ? data.order.total_amount : 0);
+
+    document.getElementById('mreceipt-details').innerHTML = `
+      <div class="mb-1 font-bold text-sbk-green">PHƯƠNG THỨC: ${payMethodText}</div>
+      ${itemsSummary}
+      <div class="border-t border-gray-200 pt-1.5 mt-1.5 font-bold flex justify-between">
+        <span>TỔNG TIỀN:</span>
+        <span class="text-sbk-green">${totalAmount.toLocaleString('vi-VN')} VNĐ</span>
+      </div>
+    `;
+
+    document.getElementById('mreceipt-status-text').textContent = 'Đang chờ Barista tiếp nhận...';
+    document.getElementById('mreceipt-status-text').className = 'font-bold text-sbk-green text-xs mt-0.5';
+
+    const modal = document.getElementById('mobile-receipt-modal');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  } catch (err) {
+    console.error('Lỗi hiển thị biên lai mobile:', err);
+    const modal = document.getElementById('mobile-receipt-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+    }
   }
-
-  const payMethodText = data.paymentMethod === 'VIETQR' ? 'Chuyển khoản VietQR' : 'Tiền mặt Kiosk';
-
-  document.getElementById('mreceipt-details').innerHTML = `
-    <div class="mb-1 font-bold text-sbk-green">PHƯƠNG THỨC: ${payMethodText}</div>
-    ${itemsSummary}
-    <div class="border-t border-gray-200 pt-1.5 mt-1.5 font-bold flex justify-between">
-      <span>TỔNG TIỀN:</span>
-      <span class="text-sbk-green">${data.calculatedTotal.toLocaleString('vi-VN')} VNĐ</span>
-    </div>
-  `;
-
-  document.getElementById('mreceipt-status-text').textContent = 'Đang chờ Barista tiếp nhận...';
-  document.getElementById('mreceipt-status-text').className = 'font-bold text-sbk-green text-xs mt-0.5';
-
-  document.getElementById('mobile-receipt-modal').classList.remove('hidden');
 }
