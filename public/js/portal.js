@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isVercelOrRemote = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
   const targetUrl = isVercelOrRemote
     ? `${window.location.origin}/order`
-    : 'https://shop-ten-drab-87.vercel.app/order';
+    : 'https://shop-git-main-univer3.vercel.app/order';
 
   const badge = document.getElementById('qr-url-badge');
   if (badge) {

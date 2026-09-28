@@ -10,36 +10,36 @@
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
   <script src="/js/qrcode.min.js"></script>
 </head>
-<body class="bg-white text-slate-800 font-sans w-screen h-screen max-h-screen overflow-hidden m-0 p-0 select-none flex flex-col">
+<body class="bg-black text-slate-800 font-sans w-full h-[100dvh] max-h-[100dvh] overflow-hidden m-0 p-0 select-none flex flex-col fixed inset-0">
 
   <!-- Main Kiosk Cabinet Enclosure: Spans 100% of Webpage Edge-to-Edge -->
   <div class="w-full h-full max-h-full bg-white overflow-hidden flex flex-col m-0 p-0 rounded-none border-0">
     
     <!-- Top Cabinet Header Bar with Kiosk Branding, Mobile View Switcher & Controls -->
-    <header class="bg-gradient-to-r from-[#003822] via-[#005a38] to-[#003822] text-white px-2.5 sm:px-5 py-1.5 sm:py-2 border-b border-[#002818] flex items-center justify-between shadow-sm shrink-0">
+    <header class="bg-gradient-to-r from-[#003822] via-[#005a38] to-[#003822] text-white px-2 sm:px-5 py-1 sm:py-2 border-b border-[#002818] flex items-center justify-between shadow-sm shrink-0">
       <div class="flex items-center gap-1.5 sm:gap-2.5">
-        <div class="w-7 h-7 sm:w-8 sm:h-8 bg-white text-sbk-green rounded-full flex items-center justify-center font-black shadow-md border-2 border-sbk-gold text-xs sm:text-sm">
+        <div class="w-6 h-6 sm:w-8 sm:h-8 bg-white text-sbk-green rounded-full flex items-center justify-center font-black shadow-md border-2 border-sbk-gold text-[10px] sm:text-sm">
           ★
         </div>
         <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="text-[11px] sm:text-xs font-black tracking-wider uppercase truncate max-w-[130px] sm:max-w-none">STARBUCKS® KIOSK</h1>
-            <span class="inline-flex text-[8px] font-black bg-amber-400 text-slate-900 px-1.5 py-0.2 rounded shadow-2xs">💵 TIỀN MẶT</span>
+          <div class="flex items-center gap-1">
+            <h1 class="text-[10.5px] sm:text-xs font-black tracking-wider uppercase truncate max-w-[120px] sm:max-w-none">STARBUCKS® KIOSK</h1>
+            <span class="inline-flex text-[7.5px] font-black bg-amber-400 text-slate-900 px-1 py-0.2 rounded shadow-2xs">💵 TIỀN MẶT</span>
           </div>
           <p class="text-[8px] text-emerald-200 font-medium hidden md:block">Hệ thống máy pha chế và bán thức uống tự động thông minh</p>
         </div>
       </div>
 
       <!-- Mobile View Switcher (Visible on Mobile only: Chuyển đổi xem Toàn Cục / Menu / Nạp Tiền) -->
-      <div class="lg:hidden flex items-center bg-black/30 p-0.5 rounded-lg text-[8.5px] font-bold border border-white/10">
-        <button id="view-mode-all" class="view-mode-btn px-2 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition">Toàn Cục</button>
-        <button id="view-mode-menu" class="view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition">Menu</button>
-        <button id="view-mode-hardware" class="view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition">Nạp Tiền</button>
+      <div class="lg:hidden flex items-center bg-black/40 p-0.5 rounded-lg text-[8px] font-bold border border-white/10">
+        <button id="view-mode-all" class="view-mode-btn px-1.5 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition">Toàn Cục</button>
+        <button id="view-mode-menu" class="view-mode-btn px-1 py-0.5 rounded text-white/80 hover:text-white transition">Menu</button>
+        <button id="view-mode-hardware" class="view-mode-btn px-1 py-0.5 rounded text-white/80 hover:text-white transition">Nạp Tiền</button>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-1 sm:gap-2">
-        <a href="/portal" class="text-[9px] sm:text-[10px] font-bold bg-sbk-gold hover:bg-yellow-400 text-sbk-dark px-2 py-0.5 sm:py-1 rounded-full transition flex items-center gap-1 shadow cursor-pointer">
+        <a href="/portal" class="text-[8.5px] sm:text-[10px] font-bold bg-sbk-gold hover:bg-yellow-400 text-sbk-dark px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full transition flex items-center gap-0.5 shadow cursor-pointer">
           <span>🏛️</span> <span class="hidden sm:inline">Portal</span>
         </a>
         <button id="copy-order-link-btn" class="hidden sm:inline-flex text-[10px] font-bold bg-white/10 hover:bg-white/20 active:scale-95 text-white px-2 py-1 rounded-full border border-white/20 transition items-center gap-1 cursor-pointer">
@@ -238,48 +238,48 @@
         <div class="bg-recessed-niche warm-niche-glow rounded-xl p-1.5 sm:p-2.5 border-2 border-[#3a3f47] relative shadow-inner shrink-0 my-0.5">
           
           <!-- Top Downlight Spotlight Effect -->
-          <div class="w-16 sm:w-20 h-1 sm:h-1.5 bg-amber-300/40 rounded-full mx-auto blur-[1.5px] mb-1 shadow-[0_0_8px_rgba(251,191,36,0.6)]"></div>
+          <div class="w-14 sm:w-20 h-1 sm:h-1.5 bg-amber-300/40 rounded-full mx-auto blur-[1.5px] mb-0.5 sm:mb-1 shadow-[0_0_8px_rgba(251,191,36,0.6)]"></div>
 
           <!-- Dual Slots Row: RECEIPT (Left) and CHANGE (Right) -->
-          <div class="grid grid-cols-2 gap-1.5 sm:gap-2.5 items-start">
+          <div class="grid grid-cols-2 gap-1 sm:gap-2.5 items-start">
 
             <!-- 1. RECEIPT PRINTER SLOT (KHE IN HÓA ĐƠN) -->
             <div class="flex flex-col items-center">
-              <span class="text-[8px] sm:text-[9px] font-black text-amber-200 uppercase tracking-widest mb-0.5 flex items-center gap-0.5">
+              <span class="text-[7.5px] sm:text-[9px] font-black text-amber-200 uppercase tracking-widest mb-0.5 flex items-center gap-0.5">
                 <span>🖨️</span> <span>RECEIPT</span>
               </span>
 
               <!-- Beveled Slot Mouth -->
-              <div class="w-full bg-[#0a0b0d] h-2.5 sm:h-3 rounded slot-bezel border-t border-b border-black relative flex items-center justify-center">
+              <div class="w-full bg-[#0a0b0d] h-2 sm:h-3 rounded slot-bezel border-t border-b border-black relative flex items-center justify-center">
                 <div class="w-4/5 h-0.5 sm:h-1 bg-black/90 rounded-full"></div>
               </div>
 
               <!-- Thermal Bill Container Hanging From Slot -->
-              <div id="receipt-exit-area" class="w-full min-h-[95px] max-h-[125px] sm:min-h-[145px] sm:max-h-[175px] relative overflow-hidden mt-0 flex flex-col items-center">
+              <div id="receipt-exit-area" class="w-full min-h-[68px] max-h-[92px] sm:min-h-[145px] sm:max-h-[175px] relative overflow-hidden mt-0 flex flex-col items-center">
                 
                 <!-- Bill Placeholder when empty -->
-                <div id="receipt-idle-state" class="py-4 sm:py-6 text-center text-gray-400 text-[8.5px] sm:text-[9.5px] font-medium space-y-0.5">
-                  <div class="text-sm sm:text-base opacity-40">📄</div>
-                  <p class="text-[8px] text-gray-400 leading-tight">Hóa đơn sẽ in tại đây sau khi nạp tiền</p>
+                <div id="receipt-idle-state" class="py-2 sm:py-6 text-center text-gray-400 text-[7.5px] sm:text-[9.5px] font-medium space-y-0.5">
+                  <div class="text-xs sm:text-base opacity-40">📄</div>
+                  <p class="text-[7px] sm:text-[8px] text-gray-400 leading-tight">In tại đây sau khi nạp tiền</p>
                 </div>
 
                 <!-- Active Thermal Paper Bill (Shown during & after print) -->
-                <div id="vending-receipt" style="display: none;" class="w-[96%] thermal-paper rounded-b p-1.5 sm:p-2 text-[8px] relative shadow-lg border-t-2 border-dashed border-gray-400 cursor-pointer transition-transform hover:scale-[1.02]">
+                <div id="vending-receipt" style="display: none;" class="w-[96%] thermal-paper rounded-b p-1 sm:p-2 text-[7px] sm:text-[8px] relative shadow-lg border-t-2 border-dashed border-gray-400 cursor-pointer transition-transform hover:scale-[1.02]">
                   
                   <div class="receipt-sawtooth-bottom">
-                    <div class="text-center pb-1 border-b border-dashed border-gray-400 space-y-0.2">
-                      <p class="font-black tracking-widest text-[9.5px] text-sbk-green">★ STARBUCKS ★</p>
-                      <p id="receipt-code-display" class="font-black text-[9.5px] font-mono text-emerald-800">#SBK-0000</p>
-                      <p id="receipt-time-display" class="text-[7px] text-gray-500">2026-09-28</p>
+                    <div class="text-center pb-0.5 border-b border-dashed border-gray-400 space-y-0.2">
+                      <p class="font-black tracking-widest text-[8.5px] sm:text-[9.5px] text-sbk-green">★ STARBUCKS ★</p>
+                      <p id="receipt-code-display" class="font-black text-[8.5px] sm:text-[9.5px] font-mono text-emerald-800">#SBK-0000</p>
+                      <p id="receipt-time-display" class="text-[6.5px] sm:text-[7px] text-gray-500">2026-09-28</p>
                     </div>
 
                     <!-- Items List -->
-                    <div id="receipt-items-list" class="py-0.5 space-y-0.5 text-[7.5px] border-b border-dashed border-gray-300 max-h-14 overflow-y-auto">
+                    <div id="receipt-items-list" class="py-0.5 space-y-0.5 text-[6.5px] sm:text-[7.5px] border-b border-dashed border-gray-300 max-h-8 sm:max-h-14 overflow-y-auto">
                       <!-- Rendered dynamically -->
                     </div>
 
                     <!-- Receipt Money Summary -->
-                    <div class="py-0.5 space-y-0.2 text-[7.5px]">
+                    <div class="py-0.5 space-y-0.2 text-[6.5px] sm:text-[7.5px]">
                       <div class="flex justify-between font-bold">
                         <span>TỔNG:</span>
                         <span id="receipt-total-display">0đ</span>
@@ -295,7 +295,7 @@
                     </div>
 
                     <!-- Interactive Tear Cue (Nhấp nháy mời gọi bấm xé) -->
-                    <div id="tear-cue-banner" class="mt-1 bg-amber-400 text-slate-950 font-black text-[8px] py-0.5 px-1 rounded text-center shadow animate-tear-pulse flex items-center justify-center gap-0.5 cursor-pointer">
+                    <div id="tear-cue-banner" class="mt-0.5 bg-amber-400 text-slate-950 font-black text-[7px] sm:text-[8px] py-0.2 sm:py-0.5 px-1 rounded text-center shadow animate-tear-pulse flex items-center justify-center gap-0.5 cursor-pointer">
                       <span>👆</span> <span>BẤM ĐỂ XÉ HÓA ĐƠN</span>
                     </div>
                   </div>
@@ -303,10 +303,10 @@
                 </div>
 
                 <!-- Tear Success Banner (After bill is torn) -->
-                <div id="receipt-torn-status" style="display: none;" class="py-3 sm:py-5 text-center space-y-1">
-                  <div class="w-6 h-6 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto text-xs shadow">✓</div>
-                  <p class="text-[9.5px] font-black text-emerald-700 uppercase leading-none">ĐÃ XÉ HÓA ĐƠN</p>
-                  <p class="text-[8px] text-slate-600 leading-tight">Nhận nước tại quầy Barista</p>
+                <div id="receipt-torn-status" style="display: none;" class="py-1.5 sm:py-5 text-center space-y-0.5 sm:space-y-1">
+                  <div class="w-5 h-5 sm:w-6 sm:h-6 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto text-[10px] sm:text-xs shadow">✓</div>
+                  <p class="text-[8.5px] sm:text-[9.5px] font-black text-emerald-700 uppercase leading-none">ĐÃ XÉ HÓA ĐƠN</p>
+                  <p class="text-[7px] sm:text-[8px] text-slate-600 leading-tight">Nhận nước tại quầy Barista</p>
                 </div>
 
               </div>
@@ -314,25 +314,25 @@
 
             <!-- 2. CHANGE RETURN TRAY (KHAY TIỀN THỪA) -->
             <div class="flex flex-col items-center">
-              <span class="text-[8px] sm:text-[9px] font-black text-amber-200 uppercase tracking-widest mb-0.5 flex items-center gap-0.5">
+              <span class="text-[7.5px] sm:text-[9px] font-black text-amber-200 uppercase tracking-widest mb-0.5 flex items-center gap-0.5">
                 <span>🪙</span> <span>CHANGE</span>
               </span>
 
               <!-- Deep Inset Metallic Hopper Pocket -->
-              <div id="change-dispenser-tray" class="w-full bg-[#0f1115] rounded-lg border-2 border-[#2f333a] slot-bezel p-1.5 min-h-[95px] max-h-[125px] sm:min-h-[145px] sm:max-h-[175px] flex flex-col justify-between items-center relative overflow-hidden transition-all shadow-inner">
+              <div id="change-dispenser-tray" class="w-full bg-[#0f1115] rounded-lg border-2 border-[#2f333a] slot-bezel p-1 min-h-[68px] max-h-[92px] sm:min-h-[145px] sm:max-h-[175px] flex flex-col justify-between items-center relative overflow-hidden transition-all shadow-inner">
                 
                 <!-- Internal Amber LED Light -->
                 <div id="change-tray-led" class="absolute top-1 w-8 h-0.5 bg-gray-700 rounded-full transition-all"></div>
 
                 <!-- Tray Content Area -->
-                <div id="change-tray-contents" class="w-full flex-1 flex flex-col items-center justify-center text-center py-1 space-y-0.5">
-                  <div class="text-base text-gray-500">📥</div>
-                  <p class="text-[8px] text-gray-400 font-medium leading-tight">Khay nhận tiền thừa</p>
+                <div id="change-tray-contents" class="w-full flex-1 flex flex-col items-center justify-center text-center py-0.5 space-y-0.5">
+                  <div class="text-xs sm:text-base text-gray-500">📥</div>
+                  <p class="text-[7px] sm:text-[8px] text-gray-400 font-medium leading-tight">Khay nhận tiền thừa</p>
                 </div>
 
                 <!-- Click to Collect Change Action Button -->
                 <div id="change-collect-box" style="display: none;" class="w-full">
-                  <button id="collect-change-btn" class="w-full py-1 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 text-slate-950 font-black text-[8px] uppercase rounded shadow transition active:scale-95 flex items-center justify-center gap-0.5 cursor-pointer">
+                  <button id="collect-change-btn" class="w-full py-0.5 sm:py-1 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 text-slate-950 font-black text-[7px] sm:text-[8px] uppercase rounded shadow transition active:scale-95 flex items-center justify-center gap-0.5 cursor-pointer">
                     <span>💵</span> <span>LẤY TIỀN (<span id="tray-change-amount">0đ</span>)</span>
                   </button>
                 </div>
@@ -344,61 +344,61 @@
         </div>
 
         <!-- 3. BILL ACCEPTOR SLOT (KHE ĐÚT TIỀN MẶT POLYMER) -->
-        <div class="bg-[#16191f] rounded-xl border border-gray-700/80 p-1.5 sm:p-2.5 space-y-1 sm:space-y-1.5 shrink-0 shadow-lg">
+        <div class="bg-[#16191f] rounded-xl border border-gray-700/80 p-1 sm:p-2.5 space-y-1 sm:space-y-1.5 shrink-0 shadow-lg">
           
           <div class="flex items-center justify-between">
-            <span class="text-[9.5px] sm:text-[10px] font-black text-slate-200 uppercase tracking-wider flex items-center gap-1">
+            <span class="text-[9px] sm:text-[10px] font-black text-slate-200 uppercase tracking-wider flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
               <span>KHE NẠP TIỀN MẶT (BILL IN)</span>
             </span>
-            <span id="cash-status-led" class="text-[7.5px] sm:text-[8px] font-black text-emerald-400 bg-emerald-950/80 border border-emerald-600/50 px-1.5 py-0.2 rounded">
-              🟢 ĐANG CHỜ TIỀN
+            <span id="cash-status-led" class="text-[7px] sm:text-[8px] font-black text-gray-400 bg-gray-800 border border-gray-700 px-1.5 py-0.2 rounded">
+              ⚪ CHƯA CÓ ĐƠN
             </span>
           </div>
 
           <!-- Digital Cash Balance Display Screen (Compact 3-Column on Mobile) -->
-          <div class="bg-[#0a0d14] rounded-lg p-1.5 border border-cyan-900/60 font-mono shadow-inner">
+          <div class="bg-[#0a0d14] rounded-lg p-1 sm:p-1.5 border border-cyan-900/60 font-mono shadow-inner">
             <div class="grid grid-cols-3 gap-1 text-center">
               <div class="bg-[#111827] rounded px-1 py-0.5">
-                <span class="text-gray-400 block text-[7px] sm:text-[8px]">ĐƠN HÀNG:</span>
-                <span id="vending-due-amount" class="font-bold text-white text-[9.5px] sm:text-[11px] truncate">0 VNĐ</span>
+                <span class="text-gray-400 block text-[6.5px] sm:text-[8px]">ĐƠN HÀNG:</span>
+                <span id="vending-due-amount" class="font-bold text-white text-[9px] sm:text-[11px] truncate">0 VNĐ</span>
               </div>
               <div class="bg-[#111827] rounded px-1 py-0.5">
-                <span class="text-emerald-400 block text-[7px] sm:text-[8px]">ĐÃ NẠP VÀO:</span>
-                <span id="vending-inserted-amount" class="font-black text-emerald-300 text-[9.5px] sm:text-[11px] truncate">0 VNĐ</span>
+                <span class="text-emerald-400 block text-[6.5px] sm:text-[8px]">ĐÃ NẠP VÀO:</span>
+                <span id="vending-inserted-amount" class="font-black text-emerald-300 text-[9px] sm:text-[11px] truncate">0 VNĐ</span>
               </div>
               <div class="bg-[#111827] rounded px-1 py-0.5">
-                <span class="text-amber-400 block text-[7px] sm:text-[8px]">TIỀN THỐI DỰ KIẾN:</span>
-                <span id="vending-change-amount" class="font-black text-amber-300 text-[9.5px] sm:text-[11px] truncate">0 VNĐ</span>
+                <span class="text-amber-400 block text-[6.5px] sm:text-[8px]">TIỀN THỐI DỰ KIẾN:</span>
+                <span id="vending-change-amount" class="font-black text-amber-300 text-[9px] sm:text-[11px] truncate">0 VNĐ</span>
               </div>
             </div>
           </div>
 
           <!-- Realistic Banknote Input Buttons (1k to 500k) -->
           <div class="space-y-0.5">
-            <span class="text-[7.5px] sm:text-[8.5px] font-bold text-gray-400 uppercase tracking-wider">CHỌN TỜ TIỀN ĐÚT VÀO KHE:</span>
+            <span class="text-[7px] sm:text-[8.5px] font-bold text-gray-400 uppercase tracking-wider">CHỌN TỜ TIỀN ĐÚT VÀO KHE:</span>
             <div class="grid grid-cols-3 gap-1">
-              <button class="vbill-btn bg-slate-200 hover:bg-white text-slate-900 border border-slate-400 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="1k">1.000đ</button>
-              <button class="vbill-btn bg-purple-200 hover:bg-purple-100 text-purple-950 border border-purple-400 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="2k">2.000đ</button>
-              <button class="vbill-btn bg-amber-200 hover:bg-amber-100 text-amber-950 border border-amber-400 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="5k">5.000đ</button>
-              <button class="vbill-btn bg-amber-300 hover:bg-amber-200 text-amber-950 border border-amber-500 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="10k">10.000đ</button>
-              <button class="vbill-btn bg-sky-200 hover:bg-sky-100 text-sky-950 border border-sky-400 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="20k">20.000đ</button>
-              <button class="vbill-btn bg-pink-200 hover:bg-pink-100 text-pink-950 border border-pink-400 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="50k">50.000đ</button>
-              <button class="vbill-btn bg-emerald-200 hover:bg-emerald-100 text-emerald-950 border border-emerald-400 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="100k">100.000đ</button>
-              <button class="vbill-btn bg-rose-200 hover:bg-rose-100 text-rose-950 border border-rose-400 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="200k">200.000đ</button>
-              <button class="vbill-btn bg-cyan-200 hover:bg-cyan-100 text-cyan-950 border border-cyan-400 py-1 rounded font-black text-[9px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="500k">500.000đ</button>
+              <button class="vbill-btn bg-slate-200 hover:bg-white text-slate-900 border border-slate-400 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="1k">1.000đ</button>
+              <button class="vbill-btn bg-purple-200 hover:bg-purple-100 text-purple-950 border border-purple-400 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="2k">2.000đ</button>
+              <button class="vbill-btn bg-amber-200 hover:bg-amber-100 text-amber-950 border border-amber-400 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="5k">5.000đ</button>
+              <button class="vbill-btn bg-amber-300 hover:bg-amber-200 text-amber-950 border border-amber-500 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="10k">10.000đ</button>
+              <button class="vbill-btn bg-sky-200 hover:bg-sky-100 text-sky-950 border border-sky-400 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="20k">20.000đ</button>
+              <button class="vbill-btn bg-pink-200 hover:bg-pink-100 text-pink-950 border border-pink-400 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="50k">50.000đ</button>
+              <button class="vbill-btn bg-emerald-200 hover:bg-emerald-100 text-emerald-950 border border-emerald-400 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="100k">100.000đ</button>
+              <button class="vbill-btn bg-rose-200 hover:bg-rose-100 text-rose-950 border border-rose-400 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="200k">200.000đ</button>
+              <button class="vbill-btn bg-cyan-200 hover:bg-cyan-100 text-cyan-950 border border-cyan-400 py-0.5 sm:py-1 rounded font-black text-[8.5px] sm:text-[10px] transition active:scale-95 shadow-2xs cursor-pointer" data-bill="500k">500.000đ</button>
             </div>
           </div>
 
           <!-- Confirm Cash Payment Action Button -->
-          <button id="vending-submit-pay-btn" disabled class="w-full py-1.5 sm:py-2 bg-gray-700 text-gray-400 font-black text-[10px] sm:text-xs uppercase rounded-lg transition shadow-lg flex items-center justify-center gap-1 cursor-not-allowed">
-            <span>💵</span> <span>ĐÚT TIỀN ĐỦ ĐỂ THANH TOÁN</span>
+          <button id="vending-submit-pay-btn" disabled class="w-full py-1.5 sm:py-2 bg-gray-800 text-gray-400 border border-gray-700 font-black text-[9.5px] sm:text-xs uppercase rounded-lg transition shadow-lg flex items-center justify-center gap-1 cursor-not-allowed">
+            <span>☕</span> <span>VUI LÒNG CHỌN MÓN TRƯỚC</span>
           </button>
 
         </div>
 
-        <!-- 4. BOTTOM METALLIC KEYPAD & RFID CONTACTLESS TOUCHPAD -->
-        <div class="flex items-center justify-between px-1 pt-0.5 border-t border-gray-800 text-[8px] text-gray-500 font-bold shrink-0">
+        <!-- 4. BOTTOM METALLIC KEYPAD & RFID CONTACTLESS TOUCHPAD (HIDDEN ON SMALL MOBILE TO SAVE SPACE) -->
+        <div class="hidden sm:flex items-center justify-between px-1 pt-0.5 border-t border-gray-800 text-[8px] text-gray-500 font-bold shrink-0">
           <div class="flex items-center gap-0.5">
             <span class="w-4 h-4 bg-gray-800 rounded flex items-center justify-center text-[8px] text-gray-300 border border-gray-700 shadow-2xs font-mono">1</span>
             <span class="w-4 h-4 bg-gray-800 rounded flex items-center justify-center text-[8px] text-gray-300 border border-gray-700 shadow-2xs font-mono">2</span>

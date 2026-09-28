@@ -492,28 +492,28 @@ function updateHardwareCashDisplays() {
   if (submitBtn) {
     if (dueAmount === 0) {
       submitBtn.disabled = true;
-      submitBtn.className = 'w-full py-2.5 bg-slate-300 text-slate-500 font-black text-xs uppercase rounded-xl transition shadow flex items-center justify-center gap-1.5 cursor-not-allowed';
+      submitBtn.className = 'w-full py-1.5 sm:py-2 bg-gray-800 text-gray-400 border border-gray-700 font-black text-[9.5px] sm:text-xs uppercase rounded-lg transition shadow flex items-center justify-center gap-1 cursor-not-allowed';
       submitBtn.innerHTML = '<span>☕</span> <span>VUI LÒNG CHỌN MÓN TRƯỚC</span>';
       if (led) {
         led.textContent = '⚪ CHƯA CÓ ĐƠN';
-        led.className = 'text-[8.5px] font-black text-slate-600 bg-slate-200 border border-slate-300 px-2 py-0.5 rounded';
+        led.className = 'text-[7px] sm:text-[8px] font-black text-gray-400 bg-gray-800 border border-gray-700 px-1.5 py-0.2 rounded';
       }
     } else if (insertedTotal < dueAmount) {
       const shortage = dueAmount - insertedTotal;
       submitBtn.disabled = true;
-      submitBtn.className = 'w-full py-2.5 bg-amber-100 border border-amber-400 text-amber-900 font-black text-xs uppercase rounded-xl transition shadow flex items-center justify-center gap-1.5 cursor-not-allowed';
+      submitBtn.className = 'w-full py-1.5 sm:py-2 bg-amber-950/80 border border-amber-500/60 text-amber-300 font-black text-[9.5px] sm:text-xs uppercase rounded-lg transition shadow flex items-center justify-center gap-1 cursor-not-allowed';
       submitBtn.innerHTML = `<span>💵</span> <span>ĐÚT THÊM TIỀN (THIẾU ${shortage.toLocaleString('vi-VN')}đ)</span>`;
       if (led) {
-        led.textContent = '🟡 ĐANG CHỜ NẠP ĐỦ';
-        led.className = 'text-[8.5px] font-black text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded';
+        led.textContent = '🟡 CHỜ NẠP ĐỦ';
+        led.className = 'text-[7px] sm:text-[8px] font-black text-amber-400 bg-amber-950/80 border border-amber-600/50 px-1.5 py-0.2 rounded';
       }
     } else {
       submitBtn.disabled = false;
-      submitBtn.className = 'w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs uppercase rounded-xl transition shadow-xl cursor-pointer flex items-center justify-center gap-1.5 ring-2 ring-emerald-400/60 animate-pulse';
+      submitBtn.className = 'w-full py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-[10px] sm:text-xs uppercase rounded-lg transition shadow-xl cursor-pointer flex items-center justify-center gap-1 ring-2 ring-emerald-400/60 animate-pulse';
       submitBtn.innerHTML = `<span>✓</span> <span>XÁC NHẬN THANH TOÁN TIỀN MẶT</span>`;
       if (led) {
         led.textContent = '🟢 TIỀN ĐÃ ĐỦ — BẤM THANH TOÁN';
-        led.className = 'text-[8.5px] font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded';
+        led.className = 'text-[7px] sm:text-[8px] font-black text-emerald-400 bg-emerald-950/80 border border-emerald-600/50 px-1.5 py-0.2 rounded';
       }
     }
   }
@@ -992,7 +992,8 @@ function removeCartItem(idx) {
 
 function copyOrderLink() {
   playBeepSound();
-  const orderUrl = `${window.location.origin}/order`;
+  const isVercel = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+  const orderUrl = isVercel ? `${window.location.origin}/order` : 'https://shop-git-main-univer3.vercel.app/order';
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(orderUrl)
       .then(showCopyToast)
