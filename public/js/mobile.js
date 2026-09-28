@@ -492,28 +492,28 @@ function updateHardwareCashDisplays() {
   if (submitBtn) {
     if (dueAmount === 0) {
       submitBtn.disabled = true;
-      submitBtn.className = 'w-full py-3.5 bg-gray-700 text-gray-400 font-black text-xs uppercase rounded-xl transition shadow cursor-not-allowed flex items-center justify-center gap-2';
+      submitBtn.className = 'w-full py-2.5 bg-slate-300 text-slate-500 font-black text-xs uppercase rounded-xl transition shadow flex items-center justify-center gap-1.5 cursor-not-allowed';
       submitBtn.innerHTML = '<span>☕</span> <span>VUI LÒNG CHỌN MÓN TRƯỚC</span>';
       if (led) {
         led.textContent = '⚪ CHƯA CÓ ĐƠN';
-        led.className = 'text-[9px] font-black text-gray-400 bg-gray-900 border border-gray-700 px-2 py-0.5 rounded-md';
+        led.className = 'text-[8.5px] font-black text-slate-600 bg-slate-200 border border-slate-300 px-2 py-0.5 rounded';
       }
     } else if (insertedTotal < dueAmount) {
       const shortage = dueAmount - insertedTotal;
       submitBtn.disabled = true;
-      submitBtn.className = 'w-full py-3.5 bg-amber-900/60 border border-amber-600/50 text-amber-200 font-black text-xs uppercase rounded-xl transition shadow cursor-not-allowed flex items-center justify-center gap-2';
+      submitBtn.className = 'w-full py-2.5 bg-amber-100 border border-amber-400 text-amber-900 font-black text-xs uppercase rounded-xl transition shadow flex items-center justify-center gap-1.5 cursor-not-allowed';
       submitBtn.innerHTML = `<span>💵</span> <span>ĐÚT THÊM TIỀN (THIẾU ${shortage.toLocaleString('vi-VN')}đ)</span>`;
       if (led) {
         led.textContent = '🟡 ĐANG CHỜ NẠP ĐỦ';
-        led.className = 'text-[9px] font-black text-amber-400 bg-amber-950/80 border border-amber-500/40 px-2 py-0.5 rounded-md';
+        led.className = 'text-[8.5px] font-black text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded';
       }
     } else {
       submitBtn.disabled = false;
-      submitBtn.className = 'w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs uppercase rounded-xl transition shadow-xl cursor-pointer flex items-center justify-center gap-2 ring-2 ring-emerald-400/60 animate-pulse';
+      submitBtn.className = 'w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs uppercase rounded-xl transition shadow-xl cursor-pointer flex items-center justify-center gap-1.5 ring-2 ring-emerald-400/60 animate-pulse';
       submitBtn.innerHTML = `<span>✓</span> <span>XÁC NHẬN THANH TOÁN TIỀN MẶT</span>`;
       if (led) {
         led.textContent = '🟢 TIỀN ĐÃ ĐỦ — BẤM THANH TOÁN';
-        led.className = 'text-[9px] font-black text-emerald-300 bg-emerald-950 border border-emerald-400 px-2 py-0.5 rounded-md';
+        led.className = 'text-[8.5px] font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded';
       }
     }
   }
@@ -665,9 +665,9 @@ function handleDispenseChangeTray(changeAmount, bills) {
       ? activeKeys
           .map(
             (k) => `
-            <div class="px-2 py-1 bg-amber-400/20 border border-amber-400/40 rounded text-amber-200 text-[9px] font-black flex items-center justify-between">
+            <div class="px-2 py-1 bg-amber-100 border border-amber-300 rounded text-amber-950 text-[9px] font-black flex items-center justify-between shadow-2xs">
               <span>Tờ ${k}:</span>
-              <span class="bg-amber-500 text-slate-950 px-1 rounded">${bills[k]} tờ</span>
+              <span class="bg-amber-500 text-white px-1 rounded">${bills[k]} tờ</span>
             </div>
           `
           )

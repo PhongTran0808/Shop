@@ -1,33 +1,35 @@
 /* Smart Vending Machine Kiosk Styles & Animations */
 
-/* Brushed Metallic Background */
+/* Brushed Metallic Backgrounds */
 .bg-vending-metal {
-  background: linear-gradient(145deg, #2d3137 0%, #1a1c20 50%, #24272c 100%);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.bg-brushed-dark {
+/* Bright Brushed Silver / Stainless Steel */
+.bg-brushed-silver {
   background: 
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px),
-    linear-gradient(180deg, #282a2e 0%, #1e2023 60%, #16181a 100%);
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #f8fafc 0%, #e9eef4 50%, #dbe3eb 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 3px rgba(0,0,0,0.12);
 }
 
-.bg-recessed-niche {
-  background: linear-gradient(180deg, #0e1012 0%, #181a1d 30%, #1e2023 100%);
-  box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.8), inset 0 0 4px rgba(0, 0, 0, 0.9);
+.bg-recessed-silver-niche {
+  background: linear-gradient(180deg, #cad5e2 0%, #dfe7ef 35%, #edf2f7 100%);
+  box-shadow: inset 0 6px 14px rgba(0, 0, 0, 0.2), inset 0 0 3px rgba(0, 0, 0, 0.15);
 }
 
 /* Warm Ambient Niche Light */
-.warm-niche-glow {
-  background: radial-gradient(ellipse at top center, rgba(255, 215, 130, 0.28) 0%, rgba(255, 190, 80, 0.08) 50%, transparent 80%);
+.warm-silver-niche-glow {
+  background: radial-gradient(ellipse at top center, rgba(253, 224, 71, 0.35) 0%, rgba(250, 204, 21, 0.1) 50%, transparent 80%);
 }
 
 /* 3D Bevel Slots */
 .slot-bezel {
   box-shadow: 
-    inset 0 3px 6px rgba(0,0,0,0.9), 
-    inset 0 -1px 1px rgba(255,255,255,0.1),
-    0 1px 2px rgba(255,255,255,0.1);
+    inset 0 3px 6px rgba(0,0,0,0.85), 
+    inset 0 -1px 1px rgba(255,255,255,0.4),
+    0 1px 2px rgba(255,255,255,0.4);
 }
 
 /* Sawtooth Receipt Tear Edge */
@@ -52,9 +54,9 @@
 
 /* Thermal Paper Texture */
 .thermal-paper {
-  background: #fdfdfc;
+  background: #ffffff;
   color: #1a1a1a;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
   filter: contrast(1.05);
   font-family: 'Courier New', Courier, monospace;
 }
@@ -158,4 +160,3 @@
 .animate-bill-insert {
   animation: billInsert 0.35s ease-in forwards;
 }
-
