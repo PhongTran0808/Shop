@@ -244,26 +244,6 @@ function initCharts() {
 }
 
 function setupEventListeners() {
-  const collectBtnSidebar = document.getElementById('collect-btn-sidebar');
-  if (collectBtnSidebar) {
-    collectBtnSidebar.addEventListener('click', async () => {
-      if (!confirm('Xác nhận thu gom toàn bộ tiền mặt trong hộc ACCEPTOR về két sắt?')) return;
-      try {
-        const res = await fetch('/api/admin/cashbox/collect', { method: 'POST' });
-        const summary = await res.json();
-        renderCashbox(summary);
-        alert('Đã hoàn tất thu gom tiền mặt trong két thành công!');
-      } catch (err) {
-        alert('Lỗi khi thực hiện thu gom tiền mặt');
-      }
-    });
-  }
-
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.href = '/login.html';
-    });
-  }
+  // Empty as logout and collect actions are removed
 }
+
