@@ -2,21 +2,34 @@ let revenueChartInstance = null;
 let paymentChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  setupSocket();
   fetchCashboxData();
   fetchAuditLogs();
   initCharts();
   setupEventListeners();
+  try {
+    setupSocket();
+  } catch (err) {
+    console.warn('Socket setup error:', err);
+  }
+  // Auto-refresh admin data every 5s on Vercel
+  setInterval(() => {
+    fetchCashboxData();
+    fetchAuditLogs();
+  }, 5000);
 });
 
 function setupSocket() {
-  const socket = io({
-    auth: { token: getCookie('sbk_session') }
-  });
+  if (typeof io === 'undefined') return;
+  try {
+    const socket = io({
+      transports: ['polling', 'websocket'],
+      auth: { token: getCookie('sbk_session') },
+      timeout: 3000
+    });
 
-  socket.on('connect', () => {
-    socket.emit('join_room', 'admin_room');
-  });
+    socket.on('connect', () => {
+      socket.emit('join_room', 'admin_room');
+    });
 
   socket.on('cashbox_updated', (summary) => {
     if (summary && summary.acceptor) {

@@ -1,19 +1,32 @@
 let orders = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  setupSocket();
   fetchOrders();
   setupEventListeners();
+  try {
+    setupSocket();
+  } catch (err) {
+    console.warn('Socket setup error:', err);
+  }
+  // Auto-refresh orders every 3 seconds (reliable real-time on Vercel)
+  setInterval(fetchOrders, 3000);
 });
 
 function setupSocket() {
-  const socket = io({
-    auth: { token: getCookie('sbk_session') }
-  });
+  if (typeof io === 'undefined') {
+    console.warn('Socket.IO not available; using polling mode.');
+    return;
+  }
+  try {
+    const socket = io({
+      transports: ['polling', 'websocket'],
+      auth: { token: getCookie('sbk_session') },
+      timeout: 3000
+    });
 
-  socket.on('connect', () => {
-    socket.emit('join_room', 'barista_room');
-  });
+    socket.on('connect', () => {
+      socket.emit('join_room', 'barista_room');
+    });
 
   socket.on('new_order', (newOrder) => {
     orders.unshift(newOrder);

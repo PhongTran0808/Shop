@@ -2,26 +2,37 @@ let activePass = null;
 let html5QrcodeScanner = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  setupSocket();
-  setupQrScanner();
   setupEventListeners();
+  try {
+    setupQrScanner();
+  } catch (err) {
+    console.warn('QR scanner init error:', err);
+  }
+  try {
+    setupSocket();
+  } catch (err) {
+    console.warn('Socket init error:', err);
+  }
 });
 
 function setupSocket() {
-  const socket = io({
-    auth: { token: getCookie('sbk_session') }
-  });
+  if (typeof io === 'undefined') {
+    console.warn('Socket.IO not loaded');
+    return;
+  }
+  try {
+    const socket = io({
+      auth: { token: getCookie('sbk_session') },
+      transports: ['polling', 'websocket'],
+      timeout: 3000
+    });
 
-  socket.on('connect', () => {
-    socket.emit('join_room', 'pos_room');
-  });
-}
-
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return null;
+    socket.on('connect', () => {
+      socket.emit('join_room', 'pos_room');
+    });
+  } catch (err) {
+    console.warn('Socket connection error:', err);
+  }
 }
 
 function setupQrScanner() {

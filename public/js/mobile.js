@@ -7,36 +7,48 @@ let selectedSweetness = '50%';
 let selectedMilk = 'Sữa tươi nguyên kem';
 let customQty = 1;
 let mobileCart = [];
-let insertedBills = { '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
+let insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
 let activeOrderCode = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchMobileMenu();
-  setupSocket();
   setupEventListeners();
+  try {
+    setupSocket();
+  } catch (err) {
+    console.warn('Socket init error:', err);
+  }
 });
 
 function setupSocket() {
-  const socket = io();
+  if (typeof io === 'undefined') {
+    console.warn('Socket.IO not available in this environment');
+    return;
+  }
+  try {
+    const socket = io({ transports: ['polling', 'websocket'], timeout: 3000 });
 
-  socket.on('connect', () => {
-    socket.emit('join_room', 'kiosk_room');
-  });
+    socket.on('connect', () => {
+      socket.emit('join_room', 'kiosk_room');
+    });
 
-  socket.on('order_status_updated', (data) => {
-    if (activeOrderCode && data && data.orderCode === activeOrderCode) {
-      const statusText = document.getElementById('mreceipt-status-text');
-      if (statusText) {
-        if (data.status === 'PROCESSING') {
-          statusText.textContent = 'Barista đang pha chế thức uống của bạn...';
-          statusText.className = 'font-bold text-amber-600 text-xs mt-0.5 animate-pulse';
-        } else if (data.status === 'COMPLETED') {
-          statusText.textContent = 'ĐƠN HÀNG ĐÃ PHA CHẾ HOÀN TẤT! VUI LÒNG NHẬN NƯỚC';
-          statusText.className = 'font-bold text-green-600 text-xs mt-0.5';
+    socket.on('order_status_updated', (data) => {
+      if (activeOrderCode && data && data.orderCode === activeOrderCode) {
+        const statusText = document.getElementById('mreceipt-status-text');
+        if (statusText) {
+          if (data.status === 'PROCESSING') {
+            statusText.textContent = 'Barista đang pha chế thức uống của bạn...';
+            statusText.className = 'font-bold text-amber-600 text-xs mt-0.5 animate-pulse';
+          } else if (data.status === 'COMPLETED') {
+            statusText.textContent = 'ĐƠN HÀNG ĐÃ PHA CHẾ HOÀN TẤT! VUI LÒNG NHẬN NƯỚC';
+            statusText.className = 'font-bold text-green-600 text-xs mt-0.5';
+          }
         }
       }
-    }
-  });
+    });
+  } catch (err) {
+    console.warn('Socket connect failed:', err);
+  }
 }
 
 async function fetchMobileMenu() {
