@@ -6,7 +6,7 @@ let selectedSweetness = '50%';
 let selectedMilk = 'Sữa tươi nguyên kem';
 let cart = [];
 
-let insertedBills = { '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
+let insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchMenu();
@@ -308,7 +308,7 @@ function setupEventListeners() {
   // Cash modal buttons
   document.getElementById('close-modal-btn').addEventListener('click', closeCashModal);
   document.getElementById('reset-cash-btn').addEventListener('click', () => {
-    insertedBills = { '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
+    insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
     updateCashModalDisplay();
   });
 
@@ -374,7 +374,7 @@ function removeItem(idx) {
 }
 
 function openCashModal() {
-  insertedBills = { '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
+  insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
   updateCashModalDisplay();
   document.getElementById('cash-modal').classList.remove('hidden');
 }
@@ -385,6 +385,9 @@ function closeCashModal() {
 
 function calculateInsertedTotal() {
   return (
+    (insertedBills['1k'] || 0) * 1000 +
+    (insertedBills['2k'] || 0) * 2000 +
+    (insertedBills['5k'] || 0) * 5000 +
     (insertedBills['10k'] || 0) * 10000 +
     (insertedBills['20k'] || 0) * 20000 +
     (insertedBills['50k'] || 0) * 50000 +

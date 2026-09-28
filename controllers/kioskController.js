@@ -52,6 +52,9 @@ async function cancelSession(req, res, next) {
     let totalInserted = 0;
     if (insertedBills) {
       totalInserted =
+        (insertedBills['1k'] || 0) * 1000 +
+        (insertedBills['2k'] || 0) * 2000 +
+        (insertedBills['5k'] || 0) * 5000 +
         (insertedBills['10k'] || 0) * 10000 +
         (insertedBills['20k'] || 0) * 20000 +
         (insertedBills['50k'] || 0) * 50000 +

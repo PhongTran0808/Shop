@@ -3,7 +3,10 @@ const { queryGet, queryRun } = require('../config/database');
 async function recordAcceptorDeposit(bills) {
   await queryRun(
     `UPDATE kiosk_cashbox
-     SET bill_10k = bill_10k + ?,
+     SET bill_1k = bill_1k + ?,
+         bill_2k = bill_2k + ?,
+         bill_5k = bill_5k + ?,
+         bill_10k = bill_10k + ?,
          bill_20k = bill_20k + ?,
          bill_50k = bill_50k + ?,
          bill_100k = bill_100k + ?,
@@ -12,6 +15,9 @@ async function recordAcceptorDeposit(bills) {
          updated_at = CURRENT_TIMESTAMP
      WHERE type = 'ACCEPTOR'`,
     [
+      bills['1k'] || 0,
+      bills['2k'] || 0,
+      bills['5k'] || 0,
       bills['10k'] || 0,
       bills['20k'] || 0,
       bills['50k'] || 0,
@@ -31,7 +37,9 @@ function calculateChangeBills(changeAmount) {
     '50k': 0,
     '20k': 0,
     '10k': 0,
-    '5k': 0
+    '5k': 0,
+    '2k': 0,
+    '1k': 0
   };
 
   const denominations = [
@@ -40,7 +48,9 @@ function calculateChangeBills(changeAmount) {
     { key: '50k', val: 50000 },
     { key: '20k', val: 20000 },
     { key: '10k', val: 10000 },
-    { key: '5k', val: 5000 }
+    { key: '5k', val: 5000 },
+    { key: '2k', val: 2000 },
+    { key: '1k', val: 1000 }
   ];
 
   for (const d of denominations) {
@@ -56,7 +66,9 @@ function calculateChangeBills(changeAmount) {
 async function recordDispenserPayout(bills) {
   await queryRun(
     `UPDATE kiosk_cashbox
-     SET bill_5k = MAX(0, bill_5k - ?),
+     SET bill_1k = MAX(0, bill_1k - ?),
+         bill_2k = MAX(0, bill_2k - ?),
+         bill_5k = MAX(0, bill_5k - ?),
          bill_10k = MAX(0, bill_10k - ?),
          bill_20k = MAX(0, bill_20k - ?),
          bill_50k = MAX(0, bill_50k - ?),
@@ -65,6 +77,8 @@ async function recordDispenserPayout(bills) {
          updated_at = CURRENT_TIMESTAMP
      WHERE type = 'DISPENSER'`,
     [
+      bills['1k'] || 0,
+      bills['2k'] || 0,
       bills['5k'] || 0,
       bills['10k'] || 0,
       bills['20k'] || 0,
@@ -81,6 +95,8 @@ async function getCashboxSummary() {
   const dispenser = (await queryGet("SELECT * FROM kiosk_cashbox WHERE type = 'DISPENSER'")) || {};
 
   const calcTotal = (c) =>
+    (c.bill_1k || 0) * 1000 +
+    (c.bill_2k || 0) * 2000 +
     (c.bill_5k || 0) * 5000 +
     (c.bill_10k || 0) * 10000 +
     (c.bill_20k || 0) * 20000 +
@@ -98,7 +114,7 @@ async function getCashboxSummary() {
 async function collectCash() {
   await queryRun(
     `UPDATE kiosk_cashbox
-     SET bill_5k=0, bill_10k=0, bill_20k=0, bill_50k=0, bill_100k=0, bill_200k=0, bill_500k=0, updated_at=CURRENT_TIMESTAMP
+     SET bill_1k=0, bill_2k=0, bill_5k=0, bill_10k=0, bill_20k=0, bill_50k=0, bill_100k=0, bill_200k=0, bill_500k=0, updated_at=CURRENT_TIMESTAMP
      WHERE type = 'ACCEPTOR'`
   );
   return await getCashboxSummary();

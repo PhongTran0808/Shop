@@ -69,6 +69,9 @@ function renderCashbox(summary) {
   const acc = summary.acceptor || {};
   if (document.getElementById('acceptor-bills')) {
     document.getElementById('acceptor-bills').innerHTML = `
+      <div class="p-1.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 font-medium">1k:<br><strong class="text-emerald-700 font-bold">${acc.bill_1k || 0}</strong></div>
+      <div class="p-1.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 font-medium">2k:<br><strong class="text-emerald-700 font-bold">${acc.bill_2k || 0}</strong></div>
+      <div class="p-1.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 font-medium">5k:<br><strong class="text-emerald-700 font-bold">${acc.bill_5k || 0}</strong></div>
       <div class="p-1.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 font-medium">10k:<br><strong class="text-emerald-700 font-bold">${acc.bill_10k || 0}</strong></div>
       <div class="p-1.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 font-medium">20k:<br><strong class="text-emerald-700 font-bold">${acc.bill_20k || 0}</strong></div>
       <div class="p-1.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 font-medium">50k:<br><strong class="text-emerald-700 font-bold">${acc.bill_50k || 0}</strong></div>
@@ -81,6 +84,8 @@ function renderCashbox(summary) {
   const dis = summary.dispenser || {};
   if (document.getElementById('dispenser-bills')) {
     document.getElementById('dispenser-bills').innerHTML = `
+      <div class="p-1.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 font-medium">1k:<br><strong class="text-amber-700 font-bold">${dis.bill_1k || 0}</strong></div>
+      <div class="p-1.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 font-medium">2k:<br><strong class="text-amber-700 font-bold">${dis.bill_2k || 0}</strong></div>
       <div class="p-1.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 font-medium">5k:<br><strong class="text-amber-700 font-bold">${dis.bill_5k || 0}</strong></div>
       <div class="p-1.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 font-medium">10k:<br><strong class="text-amber-700 font-bold">${dis.bill_10k || 0}</strong></div>
       <div class="p-1.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 font-medium">20k:<br><strong class="text-amber-700 font-bold">${dis.bill_20k || 0}</strong></div>

@@ -43,14 +43,14 @@ app.get('/api/qr', (req, res) => {
 
 app.get('/api/system/network-info', (req, res) => {
   const lanIp = getLanIp();
-  const host = req.get('host') || `${lanIp}:7001`;
+  const host = req.get('host') || 'shop-ten-drab-87.vercel.app';
   const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-  const baseUrl = `${protocol}://${host}`;
+  const baseUrl = host.includes('localhost') ? 'https://shop-ten-drab-87.vercel.app' : `${protocol}://${host}`;
   res.json({
     lanIp,
-    localUrl: baseUrl,
-    lanUrl: baseUrl,
-    mobileUrl: `${baseUrl}/mobile.html`
+    localUrl: 'https://shop-ten-drab-87.vercel.app/',
+    lanUrl: 'https://shop-ten-drab-87.vercel.app/',
+    mobileUrl: 'https://shop-ten-drab-87.vercel.app/'
   });
 });
 

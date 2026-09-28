@@ -67,6 +67,9 @@ async function processKioskOrder({ items, cashInsertedBills, paymentMethod, cust
   let insertedAmount = 0;
   if (cashInsertedBills) {
     insertedAmount =
+      (cashInsertedBills['1k'] || 0) * 1000 +
+      (cashInsertedBills['2k'] || 0) * 2000 +
+      (cashInsertedBills['5k'] || 0) * 5000 +
       (cashInsertedBills['10k'] || 0) * 10000 +
       (cashInsertedBills['20k'] || 0) * 20000 +
       (cashInsertedBills['50k'] || 0) * 50000 +

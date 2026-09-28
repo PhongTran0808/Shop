@@ -404,7 +404,7 @@ async function submitMobileVietQROrder() {
 
 function openMobileCash() {
   if (mobileCart.length === 0) return alert('Vui lòng chọn món trước khi thanh toán');
-  insertedBills = { '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
+  insertedBills = { '1k': 0, '2k': 0, '5k': 0, '10k': 0, '20k': 0, '50k': 0, '100k': 0, '200k': 0, '500k': 0 };
   updateMobileCashDisplay();
   document.getElementById('mobile-cash-modal').classList.remove('hidden');
 }
@@ -412,6 +412,9 @@ function openMobileCash() {
 function updateMobileCashDisplay() {
   const cartTotal = mobileCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const insertedTotal =
+    (insertedBills['1k'] || 0) * 1000 +
+    (insertedBills['2k'] || 0) * 2000 +
+    (insertedBills['5k'] || 0) * 5000 +
     (insertedBills['10k'] || 0) * 10000 +
     (insertedBills['20k'] || 0) * 20000 +
     (insertedBills['50k'] || 0) * 50000 +
@@ -429,6 +432,9 @@ function updateMobileCashDisplay() {
 async function submitMobileCashOrder() {
   const cartTotal = mobileCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const insertedTotal =
+    (insertedBills['1k'] || 0) * 1000 +
+    (insertedBills['2k'] || 0) * 2000 +
+    (insertedBills['5k'] || 0) * 5000 +
     (insertedBills['10k'] || 0) * 10000 +
     (insertedBills['20k'] || 0) * 20000 +
     (insertedBills['50k'] || 0) * 50000 +
