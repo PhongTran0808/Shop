@@ -100,23 +100,28 @@ function renderMobileDrinkList() {
   if (!container) return;
 
   if (filtered.length === 0) {
-    container.innerHTML = '<p class="text-xs text-gray-400 text-center py-8">Không có món nào trong danh mục này</p>';
+    container.innerHTML = '<p class="col-span-full text-xs text-gray-400 text-center py-12">Không có món nào trong danh mục này</p>';
     return;
   }
 
   container.innerHTML = filtered
     .map(
       (p) => `
-    <div class="p-3 bg-white rounded-2xl border border-gray-200 shadow-xs flex items-center justify-between gap-3 group active:scale-[0.99] transition">
-      <div class="min-w-0 flex-1">
-        <span class="text-[9px] font-bold text-sbk-green uppercase bg-green-100 px-2 py-0.5 rounded inline-block mb-1">${p.category}</span>
-        <h3 class="font-bold text-xs text-sbk-dark group-hover:text-sbk-green leading-snug line-clamp-2">${p.name}</h3>
-        <p class="text-xs font-bold text-sbk-green mt-1">${p.base_price.toLocaleString('vi-VN')} VNĐ</p>
+    <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-sbk-green/60 transition flex flex-col justify-between gap-3 group">
+      <div class="space-y-2">
+        <div class="flex justify-between items-start gap-2">
+          <span class="text-[9px] sm:text-[10px] font-bold text-sbk-green uppercase bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md inline-block">${p.category}</span>
+          <span class="text-xs sm:text-sm font-black text-sbk-green bg-green-50 px-2.5 py-0.5 rounded-full">${p.base_price.toLocaleString('vi-VN')} VNĐ</span>
+        </div>
+        <h3 class="font-black text-xs sm:text-sm text-sbk-dark group-hover:text-sbk-green transition leading-snug line-clamp-2">${p.name}</h3>
       </div>
 
-      <button class="open-custom-btn px-3 py-2 bg-sbk-green text-white text-xs font-bold uppercase rounded-full shadow hover:bg-[#004225] shrink-0" data-id="${p.id}">
-        CHỌN MÓN
-      </button>
+      <div class="pt-2.5 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
+        <span class="text-[10px] text-gray-400 font-medium">Tall • Grande • Venti</span>
+        <button class="open-custom-btn px-4 py-2 bg-sbk-green text-white text-xs font-bold uppercase rounded-xl shadow hover:bg-[#004225] active:scale-95 transition flex items-center gap-1 cursor-pointer shrink-0" data-id="${p.id}">
+          <span>+</span> <span>Tùy Chọn</span>
+        </button>
+      </div>
     </div>
   `
     )
@@ -291,6 +296,11 @@ function setupEventListeners() {
   document.getElementById('open-cart-btn').addEventListener('click', openCartModal);
   document.getElementById('close-cart-modal-btn').addEventListener('click', closeCartModal);
 
+  const headerCartBtn = document.getElementById('header-cart-btn');
+  if (headerCartBtn) {
+    headerCartBtn.addEventListener('click', openCartModal);
+  }
+
   // Payment Buttons
   document.getElementById('pay-vietqr-mobile-btn').addEventListener('click', openMobileVietQR);
   document.getElementById('close-mobile-vietqr-btn').addEventListener('click', () => {
@@ -375,8 +385,15 @@ function updateMobileCartBar() {
   const totalCount = mobileCart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = mobileCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  document.getElementById('mobile-cart-count').textContent = totalCount;
-  document.getElementById('mobile-cart-total').textContent = `${totalPrice.toLocaleString('vi-VN')} VNĐ`;
+  const countEl = document.getElementById('mobile-cart-count');
+  if (countEl) countEl.textContent = totalCount;
+  const totalEl = document.getElementById('mobile-cart-total');
+  if (totalEl) totalEl.textContent = `${totalPrice.toLocaleString('vi-VN')} VNĐ`;
+
+  const headerCartBadge = document.getElementById('header-cart-badge');
+  if (headerCartBadge) {
+    headerCartBadge.textContent = totalCount;
+  }
 }
 
 function openCartModal() {

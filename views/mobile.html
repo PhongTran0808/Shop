@@ -3,89 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Starbucks® Mobile Order — Đặt Món Trực Tuyến</title>
+  <title>Starbucks® Online Order — Đặt Món Trực Tuyến (Web & Mobile)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/style.css">
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
   <script src="/js/qrcode.min.js"></script>
 </head>
-<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen flex flex-col items-center justify-start select-none pb-24">
+<body class="bg-[#f1f5f9] text-slate-800 font-sans min-h-screen flex flex-col items-center justify-start select-none pb-28">
 
-  <!-- Mobile Container Wrapper (Max 480px for mobile devices) -->
-  <div class="w-full max-w-md bg-white min-h-screen flex flex-col shadow-xl border-x border-gray-200 relative">
+  <!-- Responsive Container Wrapper: 100% on mobile, max-w-6xl with shadow on tablet/desktop -->
+  <div class="w-full max-w-6xl mx-auto bg-white min-h-screen flex flex-col shadow-2xl rounded-none md:rounded-3xl md:my-5 md:border border-gray-200 relative overflow-hidden">
 
     <!-- Sticky Top App Header -->
-    <header class="sticky top-0 z-30 bg-sbk-green text-white px-4 py-3 flex items-center justify-between shadow-md">
-      <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 bg-white text-sbk-green rounded-full flex items-center justify-center text-[10px] font-black shadow">SBK</div>
+    <header class="sticky top-0 z-30 bg-sbk-green text-white px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-md">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 bg-white text-sbk-green rounded-full flex items-center justify-center text-xs font-black shadow">SBK</div>
         <div>
-          <h1 class="text-xs font-bold tracking-wider uppercase">STARBUCKS® MOBILE ORDER</h1>
-          <p class="text-[9px] text-sbk-cream">Mạng Wi-Fi / LAN Local Store</p>
+          <h1 class="text-xs sm:text-sm font-black tracking-wider uppercase">STARBUCKS® STORE ORDER</h1>
+          <p class="text-[9px] sm:text-[10px] text-sbk-cream font-medium">Đặt món trực tuyến đa nền tảng (Web & Điện thoại)</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span class="text-[9px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-full border border-white/20">ONLINE</span>
-        <button id="copy-order-link-btn" class="text-[10px] font-bold bg-white text-sbk-green px-3 py-1 rounded-full shadow hover:bg-emerald-50 active:scale-95 transition flex items-center gap-1 cursor-pointer">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span class="hidden sm:inline-flex text-[10px] font-bold bg-white/20 text-white px-2.5 py-1 rounded-full border border-white/20">🟢 ĐANG MỞ CỬA</span>
+        <button id="copy-order-link-btn" class="text-[10px] sm:text-xs font-bold bg-white text-sbk-green hover:bg-emerald-50 active:scale-95 px-3 py-1.5 rounded-full shadow transition flex items-center gap-1 cursor-pointer">
           <span>📋</span> <span>Sao chép link</span>
+        </button>
+        <button id="header-cart-btn" class="flex items-center gap-2 bg-sbk-gold hover:bg-yellow-400 text-sbk-dark font-bold text-xs px-3.5 py-1.5 rounded-full shadow transition cursor-pointer">
+          <span>🛒 Giỏ hàng</span>
+          <span id="header-cart-badge" class="bg-sbk-dark text-white px-1.5 py-0.5 rounded-full text-[10px] font-black">0</span>
         </button>
       </div>
     </header>
 
     <!-- Copy Toast Notification -->
-    <div id="toast-notify" class="fixed top-3 left-1/2 -translate-x-1/2 z-[100] bg-emerald-900 text-white text-xs font-bold px-4 py-2 rounded-full shadow-2xl transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-1.5 border border-emerald-400">
+    <div id="toast-notify" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] bg-emerald-900 text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded-full shadow-2xl transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2 border border-emerald-400">
       <span>✓</span> <span>Đã sao chép link đặt món vào bộ nhớ tạm!</span>
     </div>
 
     <!-- Sticky Category Scroll Pill Bar -->
-    <div class="sticky top-[49px] z-20 bg-white border-b border-gray-200 p-2 shadow-xs">
-      <div id="mobile-category-bar" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs font-bold">
+    <div class="sticky top-[58px] z-20 bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 sm:px-6 py-3 shadow-xs">
+      <div id="mobile-category-bar" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 text-xs font-bold">
         <!-- Rendered dynamically -->
       </div>
     </div>
 
-    <!-- Main Beverages Stack -->
-    <main class="flex-1 p-3 space-y-2.5">
+    <!-- Main Beverages Grid -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-4">
       <div class="flex justify-between items-center px-1">
-        <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider">DANH MỤC THỨC UỐNG STARBUCKS</h2>
-        <span id="mobile-menu-badge" class="text-[10px] bg-sbk-green text-white px-2 py-0.5 rounded-full font-mono">48 MÓN</span>
+        <div>
+          <h2 class="text-sm sm:text-base font-black text-gray-800 uppercase tracking-wider">DANH MỤC THỨC UỐNG STARBUCKS</h2>
+          <p class="text-xs text-gray-500 font-medium hidden sm:block">Chọn món yêu thích để tùy chỉnh kích cỡ, lượng đá, độ ngọt và loại sữa</p>
+        </div>
+        <span id="mobile-menu-badge" class="text-xs bg-sbk-green text-white px-3 py-1 rounded-full font-mono font-bold shadow-xs">48 MÓN</span>
       </div>
 
-      <div id="mobile-drink-list" class="space-y-2">
-        <!-- Beverage items rendered dynamically -->
+      <div id="mobile-drink-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4.5">
+        <!-- Beverage items rendered dynamically in responsive grid -->
       </div>
     </main>
 
-    <!-- Floating Bottom Sticky Cart Bar -->
-    <div id="mobile-cart-bar" class="fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl flex items-center justify-between">
+    <!-- Floating Bottom Sticky Cart Bar (Responsive: stretches on mobile, floats elegantly on desktop) -->
+    <div id="mobile-cart-bar" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-8 sm:bottom-8 z-30 sm:w-96 p-3.5 bg-sbk-dark/95 backdrop-blur-md text-white rounded-2xl border border-sbk-gold/30 shadow-2xl flex items-center justify-between transition-all">
       <div class="flex items-center gap-3">
         <div class="relative">
-          <div class="w-10 h-10 bg-sbk-green text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
+          <div class="w-10 h-10 bg-sbk-green text-white rounded-full flex items-center justify-center font-bold text-base shadow">
             ☕
           </div>
           <span id="mobile-cart-count" class="absolute -top-1 -right-1 bg-sbk-gold text-sbk-dark font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-white shadow">0</span>
         </div>
         <div>
           <p class="text-[10px] font-bold text-gray-400 uppercase">TỔNG ĐƠN HÀNG</p>
-          <p id="mobile-cart-total" class="text-base font-bold text-sbk-dark">0 VNĐ</p>
+          <p id="mobile-cart-total" class="text-base font-bold text-sbk-cream font-mono">0 VNĐ</p>
         </div>
       </div>
 
-      <button id="open-cart-btn" class="px-5 py-2.5 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-full transition shadow-md">
+      <button id="open-cart-btn" class="px-5 py-2.5 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-xl transition shadow-md active:scale-95 cursor-pointer">
         XEM GIỎ HÀNG
       </button>
     </div>
 
-    <!-- Drink Customizer Bottom Sheet Modal -->
-    <div id="customizer-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex flex-col justify-end hidden">
-      <div class="bg-white rounded-t-3xl p-5 max-w-md w-full mx-auto space-y-4 max-h-[85vh] overflow-y-auto border-t-2 border-sbk-green shadow-2xl">
-        <div class="flex justify-between items-start pb-2 border-b border-gray-100">
+    <!-- Drink Customizer Modal (Responsive: bottom sheet on phone, centered modal on desktop) -->
+    <div id="customizer-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex flex-col justify-end sm:justify-center sm:items-center hidden p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-3xl p-5 sm:p-7 max-w-lg w-full mx-auto space-y-4 max-h-[88vh] overflow-y-auto border-t-2 sm:border-2 border-sbk-green shadow-2xl">
+        <div class="flex justify-between items-start pb-3 border-b border-gray-100">
           <div>
-            <span id="custom-cat-badge" class="text-[9px] font-bold bg-green-100 text-sbk-green px-2 py-0.5 rounded uppercase">CATEGORY</span>
-            <h3 id="custom-drink-title" class="text-base font-bold text-sbk-dark uppercase mt-1">TÊN MÓN</h3>
-            <p id="custom-drink-base-price" class="text-xs font-bold text-sbk-green mt-0.5">0 VNĐ</p>
+            <span id="custom-cat-badge" class="text-[10px] font-bold bg-green-100 text-sbk-green px-2.5 py-0.5 rounded-full uppercase">CATEGORY</span>
+            <h3 id="custom-drink-title" class="text-base sm:text-lg font-black text-sbk-dark uppercase mt-1">TÊN MÓN</h3>
+            <p id="custom-drink-base-price" class="text-sm font-bold text-sbk-green mt-0.5">0 VNĐ</p>
           </div>
-          <button id="close-custom-btn" class="text-gray-400 hover:text-red-500 font-bold text-sm bg-gray-100 w-7 h-7 rounded-full flex items-center justify-center">✕</button>
+          <button id="close-custom-btn" class="text-gray-400 hover:text-red-500 font-bold text-sm bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition">✕</button>
         </div>
 
         <!-- Size Selection -->
@@ -115,45 +122,48 @@
         <!-- Quantity & Add to Cart -->
         <div class="pt-3 border-t border-gray-100 flex items-center gap-3">
           <div class="flex items-center border border-gray-300 rounded-full overflow-hidden bg-gray-50">
-            <button id="qty-minus" class="w-9 h-9 font-bold text-gray-600 hover:bg-gray-200">-</button>
-            <span id="qty-val" class="w-8 text-center text-xs font-bold text-sbk-dark">1</span>
-            <button id="qty-plus" class="w-9 h-9 font-bold text-gray-600 hover:bg-gray-200">+</button>
+            <button id="qty-minus" class="w-10 h-10 font-bold text-gray-600 hover:bg-gray-200 cursor-pointer">-</button>
+            <span id="qty-val" class="w-8 text-center text-sm font-bold text-sbk-dark">1</span>
+            <button id="qty-plus" class="w-10 h-10 font-bold text-gray-600 hover:bg-gray-200 cursor-pointer">+</button>
           </div>
 
-          <button id="confirm-add-cart-btn" class="flex-1 py-3 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-full shadow transition">
+          <button id="confirm-add-cart-btn" class="flex-1 py-3.5 bg-sbk-green hover:bg-[#004225] text-white font-black text-xs uppercase rounded-full shadow transition active:scale-95 cursor-pointer">
             THÊM VÀO ĐƠN HÀNG — <span id="custom-total-btn">0</span> VNĐ
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Mobile Cart & Checkout Modal -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex flex-col justify-end hidden">
-      <div class="bg-white rounded-t-3xl p-5 max-w-md w-full mx-auto space-y-4 max-h-[90vh] overflow-y-auto border-t-2 border-sbk-green shadow-2xl flex flex-col">
-        <div class="flex justify-between items-center pb-2 border-b border-gray-100 shrink-0">
-          <h3 class="text-sm font-bold text-sbk-green uppercase">CHI TIẾT ĐƠN HÀNG MOBILE</h3>
-          <button id="close-cart-modal-btn" class="text-gray-400 hover:text-red-500 font-bold text-sm bg-gray-100 w-7 h-7 rounded-full flex items-center justify-center">✕</button>
+    <!-- Mobile & Web Cart & Checkout Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex flex-col justify-end sm:justify-center sm:items-center hidden p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-3xl p-5 sm:p-7 max-w-lg w-full mx-auto space-y-4 max-h-[90vh] overflow-y-auto border-t-2 sm:border-2 border-sbk-green shadow-2xl flex flex-col">
+        <div class="flex justify-between items-center pb-3 border-b border-gray-100 shrink-0">
+          <div>
+            <h3 class="text-sm sm:text-base font-black text-sbk-green uppercase">CHI TIẾT ĐƠN HÀNG ĐÃ CHỌN</h3>
+            <p class="text-[11px] text-gray-400">Kiểm tra lại thức uống trước khi thanh toán</p>
+          </div>
+          <button id="close-cart-modal-btn" class="text-gray-400 hover:text-red-500 font-bold text-sm bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition">✕</button>
         </div>
 
         <!-- Cart Items Container -->
-        <div id="cart-modal-items" class="space-y-2 flex-1 overflow-y-auto max-h-60 pr-1"></div>
+        <div id="cart-modal-items" class="space-y-2 flex-1 overflow-y-auto max-h-64 pr-1"></div>
 
         <!-- Order Total & Checkout Options -->
         <div class="pt-3 border-t border-gray-200 space-y-3 shrink-0">
           <div class="flex justify-between items-end">
             <span class="text-xs font-bold text-gray-500 uppercase">TỔNG THANH TOÁN:</span>
-            <span id="cart-modal-total" class="text-xl font-bold text-sbk-dark">0 VNĐ</span>
+            <span id="cart-modal-total" class="text-2xl font-black text-sbk-dark font-mono">0 VNĐ</span>
           </div>
 
-          <div class="space-y-2">
-            <button id="pay-vietqr-mobile-btn" class="w-full py-3 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-xl transition shadow flex flex-col items-center justify-center">
-              <span>THANH TOÁN CHUYỂN KHOẢN VIETQR</span>
-              <span class="text-[9px] font-normal text-sbk-cream">(Quét mã QR Ngân hàng / MoMo)</span>
+          <div class="space-y-2.5">
+            <button id="pay-vietqr-mobile-btn" class="w-full py-3.5 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-xl transition shadow flex flex-col items-center justify-center cursor-pointer">
+              <span class="font-extrabold text-sm">THANH TOÁN CHUYỂN KHOẢN VIETQR</span>
+              <span class="text-[10px] font-normal text-sbk-cream">(Quét mã QR Ngân hàng / MoMo)</span>
             </button>
 
-            <button id="pay-cash-mobile-btn" class="w-full py-2.5 bg-sbk-gold hover:bg-yellow-400 text-sbk-dark font-bold text-xs uppercase rounded-xl transition shadow flex flex-col items-center justify-center">
-              <span>THANH TOÁN TIỀN MẶT KIOSK</span>
-              <span class="text-[9px] font-normal opacity-80">(Mô phỏng nạp tiền mặt tại Kiosk)</span>
+            <button id="pay-cash-mobile-btn" class="w-full py-3 bg-sbk-gold hover:bg-yellow-400 text-sbk-dark font-bold text-xs uppercase rounded-xl transition shadow flex flex-col items-center justify-center cursor-pointer">
+              <span class="font-extrabold text-sm">THANH TOÁN TIỀN MẶT KIOSK</span>
+              <span class="text-[10px] font-normal opacity-85">(Mô phỏng nạp tiền mặt tại Kiosk)</span>
             </button>
           </div>
         </div>
@@ -253,6 +263,6 @@
 
   </div>
 
-  <script src="/js/mobile.js?v=2.4"></script>
+  <script src="/js/mobile.js?v=2.5"></script>
 </body>
 </html>
