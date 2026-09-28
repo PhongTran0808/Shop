@@ -1,0 +1,161 @@
+/* Smart Vending Machine Kiosk Styles & Animations */
+
+/* Brushed Metallic Background */
+.bg-vending-metal {
+  background: linear-gradient(145deg, #2d3137 0%, #1a1c20 50%, #24272c 100%);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.bg-brushed-dark {
+  background: 
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #282a2e 0%, #1e2023 60%, #16181a 100%);
+}
+
+.bg-recessed-niche {
+  background: linear-gradient(180deg, #0e1012 0%, #181a1d 30%, #1e2023 100%);
+  box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.8), inset 0 0 4px rgba(0, 0, 0, 0.9);
+}
+
+/* Warm Ambient Niche Light */
+.warm-niche-glow {
+  background: radial-gradient(ellipse at top center, rgba(255, 215, 130, 0.28) 0%, rgba(255, 190, 80, 0.08) 50%, transparent 80%);
+}
+
+/* 3D Bevel Slots */
+.slot-bezel {
+  box-shadow: 
+    inset 0 3px 6px rgba(0,0,0,0.9), 
+    inset 0 -1px 1px rgba(255,255,255,0.1),
+    0 1px 2px rgba(255,255,255,0.1);
+}
+
+/* Sawtooth Receipt Tear Edge */
+.receipt-sawtooth {
+  background: 
+    radial-gradient(circle, transparent, transparent 3px, #ffffff 3.5px) -4px -3px / 8px 8px repeat-x,
+    #ffffff;
+}
+
+.receipt-sawtooth-bottom {
+  position: relative;
+}
+.receipt-sawtooth-bottom::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: radial-gradient(circle, transparent, transparent 3px, #ffffff 3.5px) -4px -3px / 8px 8px repeat-x;
+}
+
+/* Thermal Paper Texture */
+.thermal-paper {
+  background: #fdfdfc;
+  color: #1a1a1a;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.35);
+  filter: contrast(1.05);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Print Slide Down Animation */
+@keyframes printSlideDown {
+  0% {
+    transform: translateY(-85%);
+    opacity: 0.2;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+.animate-print-bill {
+  animation: printSlideDown 2.2s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+}
+
+/* Bill Tear Off Animation */
+@keyframes tearOffAnimation {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  20% {
+    transform: translateY(6px) rotate(-3deg) scale(0.98);
+  }
+  50% {
+    transform: translateY(40px) rotate(8deg) scale(0.92);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(180px) rotate(18deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
+.animate-tear-off {
+  animation: tearOffAnimation 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+}
+
+/* Pulse Glow on Tear Indicator */
+@keyframes tearPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.7));
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+    filter: drop-shadow(0 0 14px rgba(234, 179, 8, 1));
+  }
+}
+
+.animate-tear-pulse {
+  animation: tearPulse 1.2s infinite ease-in-out;
+}
+
+/* Coin & Cash Drop into Tray Animation */
+@keyframes dropChange {
+  0% {
+    transform: translateY(-35px) scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(4px) scale(1.05);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-2px) scale(0.98);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-drop-change {
+  animation: dropChange 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Bill In Feed Animation */
+@keyframes billInsert {
+  0% {
+    transform: translateY(20px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px) scale(0.85);
+    opacity: 0;
+  }
+}
+
+.animate-bill-insert {
+  animation: billInsert 0.35s ease-in forwards;
+}
+
