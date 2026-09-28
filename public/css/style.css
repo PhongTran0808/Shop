@@ -1,0 +1,109 @@
+@import "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
+
+:root {
+  --sbk-green: #006241;
+  --sbk-dark: #1e3932;
+  --sbk-light: #f2f0eb;
+  --sbk-cream: #d4e9e2;
+  --sbk-gold: #cba258;
+  --sbk-admin-bg: #0d241c;
+  --sbk-admin-card: #002b1c;
+  --sbk-admin-border: #004225;
+}
+
+.bg-sbk-green { background-color: var(--sbk-green); }
+.bg-sbk-dark { background-color: var(--sbk-dark); }
+.bg-sbk-light { background-color: var(--sbk-light); }
+.bg-sbk-cream { background-color: var(--sbk-cream); }
+.bg-sbk-gold { background-color: var(--sbk-gold); }
+
+.bg-sbk-admin-bg { background-color: var(--sbk-admin-bg); }
+.bg-sbk-admin-card { background-color: var(--sbk-admin-card); }
+
+.text-sbk-green { color: var(--sbk-green); }
+.text-sbk-dark { color: var(--sbk-dark); }
+.text-sbk-cream { color: var(--sbk-cream); }
+.text-sbk-gold { color: var(--sbk-gold); }
+
+.border-sbk-green { border-color: var(--sbk-green); }
+.border-sbk-gold { border-color: var(--sbk-gold); }
+.border-sbk-admin { border-color: var(--sbk-admin-border); }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Custom Scrollbar for Menu List */
+#full-menu-list::-webkit-scrollbar,
+#cart-items::-webkit-scrollbar,
+#product-detail-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#full-menu-list::-webkit-scrollbar-track,
+#cart-items::-webkit-scrollbar-track,
+#product-detail-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+#full-menu-list::-webkit-scrollbar-thumb,
+#cart-items::-webkit-scrollbar-thumb,
+#product-detail-container::-webkit-scrollbar-thumb {
+  background: #006241;
+  border-radius: 4px;
+}
+
+#full-menu-list::-webkit-scrollbar-thumb:hover {
+  background: #cba258;
+}
+
+/* Admin Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #001f14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #006241;
+  border-radius: 4px;
+}
+
+/* Cash Dispenser Hardware Animation */
+@keyframes billSlideDown {
+  0% {
+    transform: translateY(-25px) scale(0.85);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(2px) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-bill-dispense {
+  animation: billSlideDown 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes trayGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(234, 179, 8, 0.4);
+    border-color: rgba(234, 179, 8, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.9);
+    border-color: rgba(250, 204, 21, 1);
+  }
+}
+
+.tray-dispensing-glow {
+  animation: trayGlow 1s infinite;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starbucks — Chọn Quyền Truy Cập Nhanh</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#f8fafc] text-slate-800 min-h-screen flex items-center justify-center p-4 select-none">
+
+  <div class="max-w-md w-full bg-sbk-green rounded-2xl shadow-2xl p-8 border border-white/10 text-center">
+    
+    <div class="flex justify-start mb-4">
+      <a href="/" class="text-xs font-bold text-sbk-cream hover:text-white flex items-center gap-1 bg-black/20 px-3.5 py-1.5 rounded-full border border-white/10">
+        Quay Lại Portal (3 Roles)
+      </a>
+    </div>
+
+    <div class="inline-flex items-center justify-center px-4 py-1.5 bg-white text-sbk-green rounded-full text-xs font-black tracking-widest shadow mb-4">SBK LOGIN</div>
+    <h1 class="text-xl font-bold tracking-wide uppercase">CHỌN VAI TRÒ TRUY CẬP HỆ THỐNG</h1>
+    <p class="text-sbk-cream text-xs mt-1">1-Click Access — Chọn vai trò để vào thẳng màn hình làm việc</p>
+
+    <div class="mt-6 space-y-3">
+      <button onclick="loginAs('KIOSK')" class="w-full py-3.5 bg-white text-sbk-dark hover:bg-sbk-cream font-bold text-sm uppercase rounded-xl transition shadow flex items-center justify-center">
+        Vào Màn Hình Kiosk Khách Hàng (24")
+      </button>
+
+      <button onclick="loginAs('BARISTA')" class="w-full py-3.5 bg-sbk-gold hover:bg-yellow-400 text-sbk-dark font-bold text-sm uppercase rounded-xl transition shadow flex items-center justify-center">
+        Vào Màn Hình Barista Pha Chế (KDS)
+      </button>
+
+      <button onclick="loginAs('ADMIN')" class="w-full py-3.5 bg-[#001f14] hover:bg-black text-white font-bold text-sm uppercase rounded-xl transition shadow flex items-center justify-center border border-white/20">
+        Vào Admin Executive Dashboard (Tone Green)
+      </button>
+    </div>
+
+    <div id="error-msg" class="text-red-300 text-xs font-bold hidden bg-red-900/40 py-2 rounded-lg mt-4"></div>
+  </div>
+
+  <script>
+    async function loginAs(role) {
+      let pin = '1234';
+      if (role === 'BARISTA') pin = '5555';
+      if (role === 'ADMIN') pin = '8888';
+
+      try {
+        await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+
+        if (role === 'KIOSK') window.location.href = '/kiosk.html';
+        else if (role === 'BARISTA') window.location.href = '/barista.html';
+        else if (role === 'ADMIN') window.location.href = '/admin.html';
+      } catch (err) {
+        if (role === 'KIOSK') window.location.href = '/kiosk.html';
+        else if (role === 'BARISTA') window.location.href = '/barista.html';
+        else if (role === 'ADMIN') window.location.href = '/admin.html';
+      }
+    }
+  </script>
+</body>
+</html>

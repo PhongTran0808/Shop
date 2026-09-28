@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Starbucks® Mobile Order — Đặt Món Trực Tuyến</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/qrcode.min.js"></script>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen flex flex-col items-center justify-start select-none pb-24">
+
+  <!-- Mobile Container Wrapper (Max 480px for mobile devices) -->
+  <div class="w-full max-w-md bg-white min-h-screen flex flex-col shadow-xl border-x border-gray-200 relative">
+
+    <!-- Sticky Top App Header -->
+    <header class="sticky top-0 z-30 bg-sbk-green text-white px-4 py-3 flex items-center justify-between shadow-md">
+      <div class="flex items-center gap-2.5">
+        <div class="w-7 h-7 bg-white text-sbk-green rounded-full flex items-center justify-center text-[10px] font-black shadow">SBK</div>
+        <div>
+          <h1 class="text-xs font-bold tracking-wider uppercase">STARBUCKS® MOBILE ORDER</h1>
+          <p class="text-[9px] text-sbk-cream">Mạng Wi-Fi / LAN Local Store</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[9px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-full border border-white/20">LAN ONLINE</span>
+        <a href="/" class="text-[9px] font-bold bg-sbk-gold text-sbk-dark px-2.5 py-1 rounded-full shadow hover:bg-yellow-400">Portal</a>
+      </div>
+    </header>
+
+    <!-- Sticky Category Scroll Pill Bar -->
+    <div class="sticky top-[49px] z-20 bg-white border-b border-gray-200 p-2 shadow-xs">
+      <div id="mobile-category-bar" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs font-bold">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Main Beverages Stack -->
+    <main class="flex-1 p-3 space-y-2.5">
+      <div class="flex justify-between items-center px-1">
+        <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider">DANH MỤC THỨC UỐNG STARBUCKS</h2>
+        <span id="mobile-menu-badge" class="text-[10px] bg-sbk-green text-white px-2 py-0.5 rounded-full font-mono">48 MÓN</span>
+      </div>
+
+      <div id="mobile-drink-list" class="space-y-2">
+        <!-- Beverage items rendered dynamically -->
+      </div>
+    </main>
+
+    <!-- Floating Bottom Sticky Cart Bar -->
+    <div id="mobile-cart-bar" class="fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <div class="w-10 h-10 bg-sbk-green text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
+            ☕
+          </div>
+          <span id="mobile-cart-count" class="absolute -top-1 -right-1 bg-sbk-gold text-sbk-dark font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-white shadow">0</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-gray-400 uppercase">TỔNG ĐƠN HÀNG</p>
+          <p id="mobile-cart-total" class="text-base font-bold text-sbk-dark">0 VNĐ</p>
+        </div>
+      </div>
+
+      <button id="open-cart-btn" class="px-5 py-2.5 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-full transition shadow-md">
+        XEM GIỎ HÀNG
+      </button>
+    </div>
+
+    <!-- Drink Customizer Bottom Sheet Modal -->
+    <div id="customizer-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex flex-col justify-end hidden">
+      <div class="bg-white rounded-t-3xl p-5 max-w-md w-full mx-auto space-y-4 max-h-[85vh] overflow-y-auto border-t-2 border-sbk-green shadow-2xl">
+        <div class="flex justify-between items-start pb-2 border-b border-gray-100">
+          <div>
+            <span id="custom-cat-badge" class="text-[9px] font-bold bg-green-100 text-sbk-green px-2 py-0.5 rounded uppercase">CATEGORY</span>
+            <h3 id="custom-drink-title" class="text-base font-bold text-sbk-dark uppercase mt-1">TÊN MÓN</h3>
+            <p id="custom-drink-base-price" class="text-xs font-bold text-sbk-green mt-0.5">0 VNĐ</p>
+          </div>
+          <button id="close-custom-btn" class="text-gray-400 hover:text-red-500 font-bold text-sm bg-gray-100 w-7 h-7 rounded-full flex items-center justify-center">✕</button>
+        </div>
+
+        <!-- Size Selection -->
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold text-gray-500 uppercase">1. CHỌN SIZE:</label>
+          <div id="custom-size-options" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
+        <!-- Ice Selection -->
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold text-gray-500 uppercase">2. LƯỢNG ĐÁ (ICE):</label>
+          <div id="custom-ice-options" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
+        <!-- Sweetness Selection -->
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold text-gray-500 uppercase">3. ĐỘ NGỌT (SWEETNESS):</label>
+          <div id="custom-sweet-options" class="grid grid-cols-3 gap-2"></div>
+        </div>
+
+        <!-- Milk Selection -->
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-bold text-gray-500 uppercase">4. TÙY CHỌN LOẠI SỮA (MILK):</label>
+          <div id="custom-milk-options" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
+        <!-- Quantity & Add to Cart -->
+        <div class="pt-3 border-t border-gray-100 flex items-center gap-3">
+          <div class="flex items-center border border-gray-300 rounded-full overflow-hidden bg-gray-50">
+            <button id="qty-minus" class="w-9 h-9 font-bold text-gray-600 hover:bg-gray-200">-</button>
+            <span id="qty-val" class="w-8 text-center text-xs font-bold text-sbk-dark">1</span>
+            <button id="qty-plus" class="w-9 h-9 font-bold text-gray-600 hover:bg-gray-200">+</button>
+          </div>
+
+          <button id="confirm-add-cart-btn" class="flex-1 py-3 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-full shadow transition">
+            THÊM VÀO ĐƠN HÀNG — <span id="custom-total-btn">0</span> VNĐ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Cart & Checkout Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex flex-col justify-end hidden">
+      <div class="bg-white rounded-t-3xl p-5 max-w-md w-full mx-auto space-y-4 max-h-[90vh] overflow-y-auto border-t-2 border-sbk-green shadow-2xl flex flex-col">
+        <div class="flex justify-between items-center pb-2 border-b border-gray-100 shrink-0">
+          <h3 class="text-sm font-bold text-sbk-green uppercase">CHI TIẾT ĐƠN HÀNG MOBILE</h3>
+          <button id="close-cart-modal-btn" class="text-gray-400 hover:text-red-500 font-bold text-sm bg-gray-100 w-7 h-7 rounded-full flex items-center justify-center">✕</button>
+        </div>
+
+        <!-- Cart Items Container -->
+        <div id="cart-modal-items" class="space-y-2 flex-1 overflow-y-auto max-h-60 pr-1"></div>
+
+        <!-- Order Total & Checkout Options -->
+        <div class="pt-3 border-t border-gray-200 space-y-3 shrink-0">
+          <div class="flex justify-between items-end">
+            <span class="text-xs font-bold text-gray-500 uppercase">TỔNG THANH TOÁN:</span>
+            <span id="cart-modal-total" class="text-xl font-bold text-sbk-dark">0 VNĐ</span>
+          </div>
+
+          <div class="space-y-2">
+            <button id="pay-vietqr-mobile-btn" class="w-full py-3 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-xl transition shadow flex flex-col items-center justify-center">
+              <span>THANH TOÁN CHUYỂN KHOẢN VIETQR</span>
+              <span class="text-[9px] font-normal text-sbk-cream">(Quét mã QR Ngân hàng / MoMo)</span>
+            </button>
+
+            <button id="pay-cash-mobile-btn" class="w-full py-2.5 bg-sbk-gold hover:bg-yellow-400 text-sbk-dark font-bold text-xs uppercase rounded-xl transition shadow flex flex-col items-center justify-center">
+              <span>THANH TOÁN TIỀN MẶT KIOSK</span>
+              <span class="text-[9px] font-normal opacity-80">(Mô phỏng nạp tiền mặt tại Kiosk)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile VietQR Modal -->
+    <div id="mobile-vietqr-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+      <div class="bg-white max-w-sm w-full rounded-2xl p-5 border border-sbk-green text-center space-y-3 shadow-2xl">
+        <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+          <h3 class="text-xs font-bold text-sbk-green uppercase">THANH TOÁN VIETQR MOBILE</h3>
+          <button id="close-mobile-vietqr-btn" class="text-gray-400 hover:text-red-500 font-bold text-xs">ĐÓNG</button>
+        </div>
+
+        <div class="p-3 bg-sbk-light rounded-xl space-y-1.5 text-left text-xs">
+          <div class="flex justify-between"><span class="text-gray-500">Ngân hàng:</span><span class="font-bold text-sbk-dark">MBBANK</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">STK:</span><span class="font-mono font-bold text-sbk-green">090011223344</span></div>
+          <div class="flex justify-between border-t border-gray-200 pt-1.5"><span class="font-bold text-gray-600">Số tiền:</span><span id="mobile-vietqr-total" class="font-bold text-sbk-green text-sm">0 VNĐ</span></div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center p-3 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+          <canvas id="mobile-vietqr-canvas" class="rounded border border-gray-200"></canvas>
+          <p class="text-[10px] text-gray-500 font-bold mt-1.5">Mở app Ngân hàng / MoMo quét mã</p>
+        </div>
+
+        <button id="confirm-mobile-vietqr-btn" class="w-full py-3 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-xl transition shadow">
+          XÁC NHẬN ĐÃ CHUYỂN TIỀN (SIMULATED)
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Cash Modal -->
+    <div id="mobile-cash-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+      <div class="bg-white max-w-sm w-full rounded-2xl p-5 border border-sbk-green space-y-3 shadow-2xl">
+        <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+          <h3 class="text-xs font-bold text-sbk-green uppercase">NẠP TIỀN MẶT KIOSK</h3>
+          <button id="close-mobile-cash-btn" class="text-gray-400 hover:text-red-500 font-bold text-xs">ĐÓNG</button>
+        </div>
+
+        <div class="p-3 bg-sbk-light rounded-xl space-y-1 text-xs">
+          <div class="flex justify-between"><span class="text-gray-500">Tổng tiền đơn:</span><span id="mcash-order-total" class="font-bold text-sbk-dark">0 VNĐ</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Đã đút vào:</span><span id="mcash-inserted" class="font-bold text-sbk-green">0 VNĐ</span></div>
+          <div class="flex justify-between border-t border-gray-200 pt-1 text-yellow-900 font-bold"><span>Dự kiến thối:</span><span id="mcash-change">0 VNĐ</span></div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <button class="mbill-btn bg-blue-50 text-blue-900 border border-blue-200 py-2 rounded font-bold text-xs" data-bill="10k">10k</button>
+          <button class="mbill-btn bg-pink-50 text-pink-900 border border-pink-200 py-2 rounded font-bold text-xs" data-bill="20k">20k</button>
+          <button class="mbill-btn bg-red-50 text-red-900 border border-red-200 py-2 rounded font-bold text-xs" data-bill="50k">50k</button>
+          <button class="mbill-btn bg-green-50 text-green-900 border border-green-200 py-2 rounded font-bold text-xs" data-bill="100k">100k</button>
+          <button class="mbill-btn bg-yellow-50 text-yellow-900 border border-yellow-200 py-2 rounded font-bold text-xs" data-bill="200k">200k</button>
+          <button class="mbill-btn bg-cyan-50 text-cyan-900 border border-cyan-200 py-2 rounded font-bold text-xs" data-bill="500k">500k</button>
+        </div>
+
+        <button id="submit-mobile-cash-btn" class="w-full py-3 bg-sbk-green hover:bg-[#004225] text-white font-bold text-xs uppercase rounded-xl transition shadow">
+          XÁC NHẬN THANH TOÁN
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Receipt & Preparation Status Modal -->
+    <div id="mobile-receipt-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+      <div class="bg-white max-w-sm w-full rounded-2xl p-5 text-center border-2 border-sbk-green space-y-3 shadow-2xl">
+        <span class="px-3 py-1 bg-green-100 text-sbk-green text-[10px] font-bold rounded-full uppercase">ĐẶT HÀNG THÀNH CÔNG</span>
+        <h3 class="text-sm font-bold text-sbk-green">BIÊN LAI ĐƠN HÀNG MOBILE</h3>
+        
+        <div class="my-3 p-3 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-left space-y-2 text-xs">
+          <p id="mreceipt-order-code" class="text-center text-xl font-bold font-mono text-sbk-dark">#SBK-0000</p>
+          <div id="mreceipt-details" class="space-y-1 border-t border-b border-gray-200 py-2"></div>
+          
+          <div id="mreceipt-status-box" class="bg-sbk-light p-2.5 rounded-lg border border-sbk-green/30 text-center">
+            <p class="text-[10px] font-bold text-gray-500 uppercase">TRẠNG THÁI PHA CHẾ BARISTA:</p>
+            <p id="mreceipt-status-text" class="font-bold text-sbk-green text-xs mt-0.5">Đang chờ Barista tiếp nhận...</p>
+          </div>
+        </div>
+
+        <button id="finish-mobile-receipt-btn" class="w-full py-3 bg-sbk-green text-white font-bold text-xs uppercase rounded-xl hover:bg-[#004225]">
+          ĐẶT THÊM MÓN MỚI
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/mobile.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starbucks Smart Kiosk — Portal Control</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/qrcode.min.js"></script>
+</head>
+<body class="bg-[#f8fafc] text-sbk-dark font-sans min-h-screen flex flex-col items-center justify-center p-6 select-none">
+
+  <div class="max-w-6xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden border border-sbk-green/30 my-auto">
+    
+    <!-- Portal Header Banner -->
+    <div class="bg-sbk-green text-white p-6 text-center">
+      <div class="inline-flex items-center justify-center px-4 py-1.5 bg-white text-sbk-green rounded-full text-xs font-black tracking-widest shadow mb-3">STARBUCKS STORE CONTROL</div>
+      <h1 class="text-2xl font-bold tracking-wide uppercase">STARBUCKS® SMART KIOSK SYSTEM</h1>
+      <p class="text-sbk-cream text-sm mt-1">Hệ Thống Bán Hàng Bán Tự Động: Nạp Tiền Mặt, Thối Tiền Lẻ & VietQR Local</p>
+    </div>
+
+    <!-- LAN Access Details & Clean Centered QR Section -->
+    <div class="p-8 flex flex-col items-center justify-center text-center border-b border-gray-100 bg-emerald-50/40">
+      <span class="px-3.5 py-1 bg-sbk-green text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-xs mb-3">KẾT NỐI MẠNG LAN / WI-FI KHÔNG DÂY</span>
+      <h2 class="text-xl font-bold text-sbk-dark uppercase">QUÉT MÃ QR ĐỂ MỞ WEB APP TRÊN ĐIỆN THOẠI</h2>
+      <p class="text-xs text-gray-500 max-w-md mt-1 mb-6 leading-relaxed">
+        Sử dụng Camera điện thoại hoặc ứng dụng Zalo / Ngân hàng để quét mã QR bên dưới để mở giao diện đặt món dành riêng cho điện thoại.
+      </p>
+
+      <div class="p-6 bg-white rounded-2xl shadow-md border-2 border-sbk-green/30 flex flex-col items-center gap-3">
+        <canvas id="qr-canvas" class="rounded-lg border border-gray-200"></canvas>
+        <span id="qr-url-badge" class="px-3 py-1 bg-gray-100 text-sbk-green font-mono font-bold text-xs rounded-full border border-gray-200">
+          Đang nạp IP LAN Server...
+        </span>
+      </div>
+    </div>
+
+    <!-- 4 System Roles Selection Grid -->
+    <div class="p-8 bg-gray-50 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      
+      <a href="/kiosk.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
+        <span class="px-2.5 py-0.5 bg-sbk-green text-white text-[10px] font-bold rounded-full uppercase mb-2.5">ROLE 1: KHÁCH HÀNG</span>
+        <span class="font-bold text-sbk-green text-sm group-hover:text-[#004225] transition">Màn Hình Kiosk 24"</span>
+        <span class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Giao diện Kiosk 24" màn hình rộng, tự chọn món & nạp tiền thối lẻ tại chỗ.</span>
+      </a>
+
+      <a href="/mobile.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-sbk-green border-dashed transition hover:bg-emerald-50/50 group">
+        <span class="px-2.5 py-0.5 bg-emerald-700 text-white text-[10px] font-bold rounded-full uppercase mb-2.5">ROLE 2: MOBILE APP</span>
+        <span class="font-bold text-emerald-800 text-sm group-hover:text-sbk-green transition">Giao Diện Điện Thoại</span>
+        <span class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">UI được thiết kế tối ưu 100% cho màn hình Smartphone (iOS / Android).</span>
+      </a>
+
+      <a href="/barista.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
+        <span class="px-2.5 py-0.5 bg-sbk-gold text-sbk-dark text-[10px] font-bold rounded-full uppercase mb-2.5">ROLE 3: PHA CHẾ</span>
+        <span class="font-bold text-sbk-dark text-sm group-hover:text-sbk-green transition">Barista Display (KDS)</span>
+        <span class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Màn hình Barista nhận đơn real-time kèm âm thanh báo pha chế.</span>
+      </a>
+
+      <a href="/admin.html" class="flex flex-col items-start p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg border-2 border-gray-200 transition hover:border-sbk-green group">
+        <span class="px-2.5 py-0.5 bg-sbk-dark text-white text-[10px] font-bold rounded-full uppercase mb-2.5">ROLE 4: QUẢN LÝ</span>
+        <span class="font-bold text-sbk-dark text-sm group-hover:text-sbk-green transition">Admin Executive</span>
+        <span class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">Báo cáo doanh thu, biểu đồ phân tích & nhật ký giao dịch tài chính.</span>
+      </a>
+
+    </div>
+
+  </div>
+
+  <script src="/js/portal.js"></script>
+</body>
+</html>
