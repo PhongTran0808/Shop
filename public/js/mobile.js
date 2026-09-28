@@ -280,29 +280,29 @@ function renderMobileDrinkList() {
     .map((p) => {
       const catIcon = categoryIcons[p.category] || '☕';
       return `
-      <div class="bg-white rounded-2xl border border-gray-200 p-3.5 sm:p-4 shadow-sm hover:shadow-md hover:border-sbk-green/60 transition flex flex-col justify-between gap-3 group">
-        <div class="space-y-2.5">
-          <div class="flex items-center justify-between gap-2">
-            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-sbk-green uppercase bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+      <div class="bg-white rounded-xl border border-gray-200 p-2 sm:p-3.5 shadow-2xs hover:shadow-md hover:border-sbk-green/60 transition flex flex-col justify-between gap-1.5 sm:gap-2.5 group">
+        <div class="space-y-1 sm:space-y-2">
+          <div class="flex items-center justify-between gap-1">
+            <span class="inline-flex items-center gap-0.5 text-[8.5px] sm:text-[10px] font-bold text-sbk-green uppercase bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
               <span>${catIcon}</span>
-              <span class="truncate max-w-[120px]">${p.category}</span>
+              <span class="truncate max-w-[80px] sm:max-w-[120px]">${p.category}</span>
             </span>
-            <span class="text-xs sm:text-sm font-black text-sbk-dark bg-sbk-light border border-sbk-green/30 px-2.5 py-0.5 rounded-full font-mono">
+            <span class="text-[10px] sm:text-xs font-black text-sbk-dark bg-sbk-light border border-sbk-green/30 px-1.5 sm:px-2 py-0.2 rounded-full font-mono shrink-0">
               ${p.base_price.toLocaleString('vi-VN')}đ
             </span>
           </div>
 
           <div>
-            <h3 class="font-black text-xs sm:text-sm text-sbk-dark group-hover:text-sbk-green transition leading-snug line-clamp-2" title="${p.name}">
+            <h3 class="font-black text-[10.5px] sm:text-xs text-sbk-dark group-hover:text-sbk-green transition leading-snug line-clamp-2" title="${p.name}">
               ${p.name}
             </h3>
-            <p class="text-[10px] text-gray-400 font-medium mt-0.5">Tall • Grande • Venti</p>
+            <p class="text-[8px] sm:text-[9.5px] text-gray-400 font-medium mt-0.5">Tall • Grande • Venti</p>
           </div>
         </div>
 
-        <div class="pt-2 border-t border-gray-100 flex items-center justify-between gap-2 mt-auto">
-          <span class="text-[9px] text-gray-400 font-bold uppercase">Tùy chọn đá & sữa</span>
-          <button class="open-custom-btn px-3 py-1.5 bg-sbk-green hover:bg-[#004225] active:scale-95 text-white text-xs font-black uppercase rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer shrink-0" data-id="${p.id}">
+        <div class="pt-1 border-t border-gray-100 flex items-center justify-between gap-1 mt-auto">
+          <span class="text-[7.5px] sm:text-[8.5px] text-gray-400 font-bold uppercase truncate">Đá & sữa</span>
+          <button class="open-custom-btn px-2 sm:px-2.5 py-1 bg-sbk-green hover:bg-[#004225] active:scale-95 text-white text-[9px] sm:text-[10px] font-black uppercase rounded-lg shadow-2xs transition flex items-center gap-0.5 cursor-pointer shrink-0" data-id="${p.id}">
             <span>+</span> <span>TÙY CHỌN</span>
           </button>
         </div>
@@ -823,13 +823,21 @@ function setupEventListeners() {
     document.getElementById('cart-modal').classList.add('hidden');
   });
 
+  // Mobile View Mode Switcher
+  setupViewModeSwitcher();
+
   const gotoHwBtn = document.getElementById('cart-goto-hardware-btn');
   if (gotoHwBtn) {
     gotoHwBtn.addEventListener('click', () => {
       playBeepSound();
       document.getElementById('cart-modal').classList.add('hidden');
+      const hwBtn = document.getElementById('view-mode-hardware');
       const hwPanel = document.getElementById('vending-hardware-panel');
-      if (hwPanel) hwPanel.scrollIntoView({ behavior: 'smooth' });
+      if (hwPanel && hwPanel.classList.contains('hidden') && hwBtn) {
+        hwBtn.click();
+      } else if (hwPanel) {
+        hwPanel.scrollIntoView({ behavior: 'smooth' });
+      }
     });
   }
 
@@ -837,8 +845,13 @@ function setupEventListeners() {
   if (quickCashBtn) {
     quickCashBtn.addEventListener('click', () => {
       playBeepSound();
+      const hwBtn = document.getElementById('view-mode-hardware');
       const hwPanel = document.getElementById('vending-hardware-panel');
-      if (hwPanel) hwPanel.scrollIntoView({ behavior: 'smooth' });
+      if (hwPanel && hwPanel.classList.contains('hidden') && hwBtn) {
+        hwBtn.click();
+      } else if (hwPanel) {
+        hwPanel.scrollIntoView({ behavior: 'smooth' });
+      }
     });
   }
 
@@ -878,6 +891,57 @@ function setupEventListeners() {
   if (copyBtn) {
     copyBtn.addEventListener('click', copyOrderLink);
   }
+}
+
+function setupViewModeSwitcher() {
+  const btnAll = document.getElementById('view-mode-all');
+  const btnMenu = document.getElementById('view-mode-menu');
+  const btnHw = document.getElementById('view-mode-hardware');
+  const touchscreen = document.getElementById('touchscreen-display');
+  const hwPanel = document.getElementById('vending-hardware-panel');
+
+  if (!btnAll || !btnMenu || !btnHw || !touchscreen || !hwPanel) return;
+
+  function setViewMode(mode) {
+    playBeepSound();
+    // Reset buttons
+    btnAll.className = 'view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition';
+    btnMenu.className = 'view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition';
+    btnHw.className = 'view-mode-btn px-1.5 py-0.5 rounded text-white/80 hover:text-white transition';
+
+    if (mode === 'all') {
+      btnAll.className = 'view-mode-btn px-2 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition';
+      touchscreen.classList.remove('hidden');
+      touchscreen.classList.remove('h-full');
+      touchscreen.classList.add('h-[46%]');
+
+      hwPanel.classList.remove('hidden');
+      hwPanel.classList.remove('h-full');
+      hwPanel.classList.add('h-[54%]');
+    } else if (mode === 'menu') {
+      btnMenu.className = 'view-mode-btn px-2 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition';
+      touchscreen.classList.remove('hidden');
+      touchscreen.classList.remove('h-[46%]');
+      touchscreen.classList.add('h-full');
+
+      hwPanel.classList.add('hidden');
+      hwPanel.classList.remove('h-[54%]');
+      hwPanel.classList.remove('h-full');
+    } else if (mode === 'hardware') {
+      btnHw.className = 'view-mode-btn px-2 py-0.5 rounded bg-white text-sbk-green font-black shadow-2xs transition';
+      touchscreen.classList.add('hidden');
+      touchscreen.classList.remove('h-[46%]');
+      touchscreen.classList.remove('h-full');
+
+      hwPanel.classList.remove('hidden');
+      hwPanel.classList.remove('h-[54%]');
+      hwPanel.classList.add('h-full');
+    }
+  }
+
+  btnAll.addEventListener('click', () => setViewMode('all'));
+  btnMenu.addEventListener('click', () => setViewMode('menu'));
+  btnHw.addEventListener('click', () => setViewMode('hardware'));
 }
 
 function openCartModal() {
