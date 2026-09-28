@@ -572,9 +572,12 @@ function showReceiptModal(data) {
     const totalAmount = data.calculatedTotal || (data.order ? data.order.total_amount : 0);
 
     document.getElementById('receipt-details').innerHTML = `
-      <div class="mb-2 font-bold text-sbk-green">PHƯƠNG THỨC: ${payMethodText}</div>
-      ${itemsSummary}
-      <div class="border-t border-gray-200 pt-2 mt-2 font-bold flex justify-between">
+      <div class="mb-2.5 font-extrabold text-sbk-green text-xs uppercase tracking-wider flex items-center gap-1.5">
+        <span class="inline-block w-2 h-2 rounded-full bg-sbk-green"></span>
+        <span>PHƯƠNG THỨC: ${payMethodText}</span>
+      </div>
+      <div class="space-y-1.5 text-xs sm:text-sm font-medium text-gray-800">${itemsSummary}</div>
+      <div class="border-t border-gray-200 pt-3 mt-3 font-black text-base sm:text-lg flex justify-between items-center">
         <span>TỔNG TIỀN:</span>
         <span class="text-sbk-green">${totalAmount.toLocaleString('vi-VN')} VNĐ</span>
       </div>
@@ -597,7 +600,12 @@ function showReceiptModal(data) {
       const bills = data.changeBills || {};
       const billsFormatted = Object.keys(bills)
         .filter((k) => bills[k] > 0)
-        .map((k) => `<span>• Tờ ${k}: <strong>${bills[k]} tờ</strong></span>`)
+        .map((k) => `
+          <div class="bg-yellow-100/90 border border-yellow-300/80 px-3 py-1.5 rounded-xl font-bold text-yellow-950 flex items-center justify-between text-xs sm:text-sm shadow-2xs">
+            <span>• Tờ ${k}:</span>
+            <span class="bg-amber-600 text-white px-2 py-0.5 rounded-md text-xs font-black">${bills[k]} tờ</span>
+          </div>
+        `)
         .join('');
 
       const billsEl = document.getElementById('receipt-change-bills');
